@@ -30,8 +30,15 @@ model TelegramChannel {
   url        String   @map("channel_url")
   userId     String   @map("user_id ")
   user       User     @relation(fields: [userId], references: [id])
+  status     ChannelStatus @default(MODERATION)
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt      @map("updated_at")
 
   @@map("telegram_channels")
+}
+
+enum ChannelStatus {
+  MODERATION
+  APPROVED
+  REJECTED
 }

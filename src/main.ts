@@ -14,7 +14,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       "http://localhost:3000",
-      "https://0752-45-133-194-164.ngrok-free.app",
+      "https://bb8a-45-133-194-164.ngrok-free.app",
     ],
     credentials: true,
     exposedHeaders: "set-cookie",
