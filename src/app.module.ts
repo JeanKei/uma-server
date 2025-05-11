@@ -4,6 +4,7 @@ import { AuthModule } from "./auth/auth.module";
 import { UserModule } from "./user/user.module";
 import { userChannelModule } from "./user-channel/user-channel.module";
 import { TelegramModule } from "./telegram/telegram.module";
+import { OrderChannelModule } from "./order-channel/order-channel.module";
 
 @Module({
   imports: [
@@ -12,6 +13,7 @@ import { TelegramModule } from "./telegram/telegram.module";
     }),
     AuthModule,
     UserModule,
+    OrderChannelModule,
     userChannelModule,
     TelegramModule,
   ],

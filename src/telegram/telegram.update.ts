@@ -1,11 +1,14 @@
-// telegram.update.ts
 import { Update, Ctx, Start, On, Action } from "nestjs-telegraf";
 import { Context } from "telegraf";
 import { TelegramService } from "./telegram.service";
+import { PrismaService } from "@/prisma.service";
 
 @Update()
 export class TelegramUpdate {
-  constructor(private readonly telegramService: TelegramService) {}
+  constructor(
+    private readonly telegramService: TelegramService,
+    private readonly prisma: PrismaService // 👈 добавили PrismaService
+  ) {}
 
   @Start()
   async onStart(@Ctx() ctx: Context) {
@@ -14,17 +17,25 @@ export class TelegramUpdate {
 
   @Action(/^(approve|reject|start_chat):(.+):(.+)$/)
   async onAction(@Ctx() ctx: Context) {
-    const callbackQuery = ctx.callbackQuery;
+    const data = "data" in ctx.callbackQuery ? ctx.callbackQuery.data : null;
+    if (!data) return;
 
-    if (!callbackQuery || !("data" in callbackQuery)) return;
-
-    const data = callbackQuery.data;
     const [action, channelId, clientId] = data.split(":");
     await this.telegramService.handleAction(ctx, action, channelId, clientId);
   }
 
   @On("text")
   async onText(@Ctx() ctx: Context) {
-    await this.telegramService.handleText(ctx);
+    const moderatorId = String(ctx.from?.id);
+
+    const session = await this.prisma.moderatorChatSession.findUnique({
+      where: { moderatorId },
+    });
+
+    if (session?.pendingRejection) {
+      await this.telegramService.handleRejectionReason(ctx);
+    } else {
+      await this.telegramService.handleReply(ctx);
+    }
   }
 }

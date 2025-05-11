@@ -1,29 +1,23 @@
 import { Injectable } from "@nestjs/common";
-import { Telegraf } from "telegraf";
 import { InjectBot } from "nestjs-telegraf";
-import { PrismaService } from "@/prisma.service";
-import { TELEGRAM_MODERATORS } from "./telegram.constants";
-import { Context } from "telegraf";
-
-type SendMessageOptions = Parameters<Telegraf["telegram"]["sendMessage"]>[2];
+import { Telegraf, Context } from "telegraf";
+import { ChatActions } from "./actions/add-channel/chat.actions";
+import { ModerationActions } from "./actions/add-channel/moderation.actions";
+import { DeleteChannelActions } from "./actions/delete-channel/delete.actions";
 
 @Injectable()
 export class TelegramService {
-  // moderatorId -> clientId
-  private chatSession = new Map<number, number>();
-
-  // clientId -> moderatorId
-  private replyMap = new Map<number, number>();
-
   constructor(
-    private readonly prisma: PrismaService,
-    @InjectBot() private readonly bot: Telegraf
+    @InjectBot() private readonly bot: Telegraf,
+    private readonly chatActions: ChatActions,
+    private readonly moderationActions: ModerationActions,
+    private readonly deleteActions: DeleteChannelActions
   ) {}
 
   async sendMessage(
     chatId: number,
     text: string,
-    extra?: Parameters<Telegraf["telegram"]["sendMessage"]>[2]
+    extra: Record<string, any> = {}
   ): Promise<void> {
     await this.bot.telegram.sendMessage(chatId, text, extra);
   }
@@ -34,72 +28,24 @@ export class TelegramService {
     channelId: string,
     clientId: string
   ) {
-    const chatId = ctx.chat?.id;
-    const messageId = (ctx.callbackQuery as any)?.message?.message_id;
-
-    if (!chatId || !messageId) return;
-
-    if (action === "start_chat") {
-      this.chatSession.set(chatId, Number(clientId)); // сохранили клиента для модератора
-      await ctx.answerCbQuery("✏️ Напишите клиенту сообщение");
-    }
-
-    // approve и reject — как раньше...
-    else if (action === "approve") {
-      await this.prisma.telegramChannel.update({
-        where: { id: channelId },
-        data: { status: "APPROVED" },
-      });
-
-      await ctx.editMessageText("✅ Модерация завершена: одобрено");
-      await this.sendMessage(Number(clientId), "✅ Ваш канал успешно одобрен.");
-      await ctx.answerCbQuery("Одобрено");
-    } else if (action === "reject") {
-      await this.prisma.telegramChannel.update({
-        where: { id: channelId },
-        data: { status: "REJECTED" },
-      });
-
-      await ctx.editMessageText("❌ Модерация завершена: отклонено");
-      await this.sendMessage(
-        Number(clientId),
-        "❌ Ваш канал отклонён модератором."
-      );
-      await ctx.answerCbQuery("Отклонено");
+    switch (action) {
+      case "approve":
+      case "reject":
+        return this.moderationActions.handle(ctx, action, channelId, clientId);
+      case "start_chat":
+        return this.chatActions.startChat(ctx, channelId, clientId);
     }
   }
 
-  async handleText(ctx: Context) {
-    const message = ctx.message as any;
-    const senderId = message?.from?.id;
-    const text = message?.text;
+  async handleReply(ctx: Context) {
+    return this.chatActions.handleReply(ctx);
+  }
 
-    if (!message || message.chat.type !== "private" || !senderId || !text)
-      return;
+  async handleRejectionReason(ctx: Context) {
+    return this.moderationActions.handleRejectionReason(ctx);
+  }
 
-    const isModerator = TELEGRAM_MODERATORS.includes(senderId);
-    const clientId = this.chatSession.get(senderId);
-
-    if (isModerator && clientId) {
-      // модератор → клиент
-      await this.sendMessage(
-        clientId,
-        `💬 <b>Сообщение от модератора</b>:\n\n${text}`,
-        { parse_mode: "HTML" }
-      );
-
-      this.replyMap.set(clientId, senderId); // сохраняем, кто писал
-      return;
-    }
-
-    // клиент → модератор
-    const moderatorId = this.replyMap.get(senderId);
-    if (moderatorId) {
-      await this.sendMessage(
-        moderatorId,
-        `📨 <b>Ответ от клиента</b>:\n@${message.from?.username} (ID: ${senderId})\n\n${text}`,
-        { parse_mode: "HTML" }
-      );
-    }
+  async notifyChannelDeleted(channelId: string) {
+    return this.deleteActions.notifyOnDelete(channelId);
   }
 }

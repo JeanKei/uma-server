@@ -2,10 +2,18 @@ import { IsNotEmpty, IsString } from "class-validator";
 
 export class UserChannelDto {
   @IsString({
-    message: "Ссылка url обязательна",
+    message: "url обязательно",
   })
   @IsNotEmpty({
-    message: "Поле ее может быть пустым",
+    message: "Поле не может быть пустым",
   })
   url: string;
+
+  // @IsString({
+  //   message: "Название обязательно",
+  // })
+  // @IsNotEmpty({
+  //   message: "Поле не может быть пустым",
+  // })
+  // title: string;
 }

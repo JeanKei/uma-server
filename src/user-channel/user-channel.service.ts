@@ -1,56 +1,3 @@
-// import { Injectable, NotFoundException } from "@nestjs/common";
-// import { PrismaService } from "src/prisma.service";
-// import { UserChannelDto } from "./dto/user-channel.dto";
-
-// @Injectable()
-// export class UserChannelService {
-//   constructor(private readonly prisma: PrismaService) {}
-
-//   async getAll() {
-//     return this.prisma.telegramChannel.findMany({
-//       orderBy: { createdAt: "desc" },
-//     });
-//   }
-
-//   async getById(id: string) {
-//     const channel = await this.prisma.telegramChannel.findUnique({
-//       where: { id },
-//     });
-
-//     if (!channel) throw new NotFoundException("Канал не найден");
-//     return channel;
-//   }
-
-//   async create(dto: UserChannelDto, userId: string) {
-//     const createdChannel = await this.prisma.telegramChannel.create({
-//       data: {
-//         url: dto.url,
-//         userId,
-//         status: "MODERATION",
-//       },
-//     });
-
-//     return createdChannel;
-//   }
-
-//   async update(id: string, dto: UserChannelDto) {
-//     await this.getById(id);
-
-//     return this.prisma.telegramChannel.update({
-//       where: { id },
-//       data: dto,
-//     });
-//   }
-
-//   async delete(id: string) {
-//     await this.getById(id);
-
-//     return this.prisma.telegramChannel.delete({
-//       where: { id },
-//     });
-//   }
-// }
-
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma.service";
 import { UserChannelDto } from "./dto/user-channel.dto";
@@ -67,6 +14,13 @@ export class UserChannelService {
 
   async getAll() {
     return this.prisma.telegramChannel.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+  }
+
+  async getUserChannels(userId: string) {
+    return this.prisma.telegramChannel.findMany({
+      where: { userId },
       orderBy: { createdAt: "desc" },
     });
   }
@@ -94,7 +48,7 @@ export class UserChannelService {
       select: { name: true, telegramId: true },
     });
 
-    // ✅ Отправляем клиенту сообщение
+    // ✅ Уведомляем клиента
     if (user?.telegramId) {
       await this.telegram.sendMessage(
         Number(user.telegramId),
@@ -103,7 +57,7 @@ export class UserChannelService {
       );
     }
 
-    // ✅ Отправляем всем модераторам сообщение с кнопками
+    // ✅ Кнопки модерации
     const inlineKeyboard = Markup.inlineKeyboard([
       [
         Markup.button.callback(
@@ -123,6 +77,7 @@ export class UserChannelService {
       ],
     ]);
 
+    // ✅ Уведомляем модераторов
     for (const modId of TELEGRAM_MODERATORS) {
       await this.telegram.sendMessage(
         modId,
@@ -147,7 +102,10 @@ export class UserChannelService {
   }
 
   async delete(id: string) {
-    await this.getById(id);
+    const channel = await this.getById(id);
+
+    // ✅ Отправляем уведомления в Telegram
+    await this.telegram.notifyChannelDeleted(id);
 
     return this.prisma.telegramChannel.delete({
       where: { id },

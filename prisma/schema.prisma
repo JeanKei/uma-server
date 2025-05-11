@@ -42,3 +42,11 @@ enum ChannelStatus {
   APPROVED
   REJECTED
 }
+
+model ModeratorChatSession {
+  moderatorId     String @id
+  clientId        String
+  pendingRejection String?
+
+  @@map("moderator_chat_sessions")
+}
