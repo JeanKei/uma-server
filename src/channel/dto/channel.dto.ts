@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsString } from "class-validator";
 
-export class UserChannelDto {
+export class ChannelDto {
   @IsString({
     message: "url обязательно",
   })

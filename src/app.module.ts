@@ -2,9 +2,8 @@ import { Module } from "@nestjs/common";
 import { ConfigModule } from "@nestjs/config";
 import { AuthModule } from "./auth/auth.module";
 import { UserModule } from "./user/user.module";
-import { userChannelModule } from "./user-channel/user-channel.module";
 import { TelegramModule } from "./telegram/telegram.module";
-import { OrderChannelModule } from "./order-channel/order-channel.module";
+import { ChannelModule } from "./channel/channel.module";
 
 @Module({
   imports: [
@@ -13,8 +12,7 @@ import { OrderChannelModule } from "./order-channel/order-channel.module";
     }),
     AuthModule,
     UserModule,
-    OrderChannelModule,
-    userChannelModule,
+    ChannelModule,
     TelegramModule,
   ],
 })

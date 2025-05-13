@@ -1,12 +1,12 @@
 import { Injectable, NotFoundException } from "@nestjs/common";
 import { PrismaService } from "src/prisma.service";
-import { UserChannelDto } from "./dto/user-channel.dto";
+import { ChannelDto } from "./dto/channel.dto";
 import { TelegramService } from "@/telegram/telegram.service";
 import { TELEGRAM_MODERATORS } from "@/telegram/telegram.constants";
 import { Markup } from "telegraf";
 
 @Injectable()
-export class UserChannelService {
+export class ChannelService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly telegram: TelegramService
@@ -14,6 +14,13 @@ export class UserChannelService {
 
   async getAll() {
     return this.prisma.telegramChannel.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+  }
+
+  async getApproved() {
+    return this.prisma.telegramChannel.findMany({
+      where: { status: "APPROVED" },
       orderBy: { createdAt: "desc" },
     });
   }
@@ -34,7 +41,7 @@ export class UserChannelService {
     return channel;
   }
 
-  async create(dto: UserChannelDto, userId: string) {
+  async create(dto: ChannelDto, userId: string) {
     const createdChannel = await this.prisma.telegramChannel.create({
       data: {
         url: dto.url,
@@ -92,7 +99,7 @@ export class UserChannelService {
     return createdChannel;
   }
 
-  async update(id: string, dto: UserChannelDto) {
+  async update(id: string, dto: ChannelDto) {
     await this.getById(id);
 
     return this.prisma.telegramChannel.update({
