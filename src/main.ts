@@ -14,7 +14,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       "http://localhost:3000",
-      "https://bb8a-45-133-194-164.ngrok-free.app",
+      "https://warning-eden-chairs-data.trycloudflare.com",
     ],
     credentials: true,
     exposedHeaders: "set-cookie",
