@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class ChannelDto {
   @IsString({
@@ -9,11 +9,7 @@ export class ChannelDto {
   })
   url: string;
 
-  // @IsString({
-  //   message: "Название обязательно",
-  // })
-  // @IsNotEmpty({
-  //   message: "Поле не может быть пустым",
-  // })
-  // title: string;
+  @IsOptional()
+  @IsBoolean()
+  isActual: boolean;
 }

@@ -30,6 +30,11 @@ export class ChannelController {
     return this.channelService.getApproved();
   }
 
+  @Get("actual")
+  async getIsActual() {
+    return this.channelService.getIsActual();
+  }
+
   @Auth()
   @Get("user")
   async getMyChannels(@CurrentUser("id") userId: string) {

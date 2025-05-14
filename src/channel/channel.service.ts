@@ -25,6 +25,13 @@ export class ChannelService {
     });
   }
 
+  async getIsActual() {
+    return this.prisma.telegramChannel.findMany({
+      where: { isActual: true },
+      orderBy: { createdAt: "desc" },
+    });
+  }
+
   async getUserChannels(userId: string) {
     return this.prisma.telegramChannel.findMany({
       where: { userId },

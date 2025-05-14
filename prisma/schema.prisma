@@ -12,8 +12,9 @@ model User {
   name       String?
   avatarPath String? @map("avatar_path")
   telegramId String? @map("telegram_id") @unique
-  rights Role[] @default([USER])
+  rights     Role[] @default([USER])
   channels   TelegramChannel[]
+  article    Article[]
 
   @@map("users")
 }
@@ -28,7 +29,7 @@ enum Role {
 model TelegramChannel {
   id         String   @id @default(cuid())
   url        String   @map("channel_url")
-  userId     String   @map("user_id ")
+  userId     String   @map("user_id")
   user       User     @relation(fields: [userId], references: [id])
   status     ChannelStatus @default(MODERATION)
   isActual   Boolean  @default(false) @map("is_actual")
@@ -50,4 +51,17 @@ model ModeratorChatSession {
   pendingRejection String?
 
   @@map("moderator_chat_sessions")
+}
+
+model Article {
+  id         String   @id @default(cuid())
+  title      String   
+  content    String 
+  slug       String   @unique
+  userId     String   @map("user_id")
+  user       User     @relation(fields: [userId], references: [id])
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt      @map("updated_at")
+
+  @@map("articles")
 }
