@@ -31,6 +31,11 @@ export class ArticleController {
     return this.articleService.getById(id);
   }
 
+  @Get("slug/:slug")
+  async getBySlug(@Param("slug") slug: string) {
+    return this.articleService.getBySlug(slug);
+  }
+
   @Auth()
   @Post()
   @HttpCode(200)

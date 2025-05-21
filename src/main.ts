@@ -14,7 +14,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       "http://localhost:3000",
-      "https://homework-lucy-pressed-around.trycloudflare.com",
+      "https://charitable-revelation-multimedia-kept.trycloudflare.com/auth/login",
     ],
     credentials: true,
     exposedHeaders: "set-cookie",

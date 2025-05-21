@@ -21,6 +21,15 @@ export class ArticleService {
     return article;
   }
 
+  async getBySlug(slug: string) {
+    const article = await this.prisma.article.findUnique({
+      where: { slug },
+    });
+
+    if (!article) throw new NotFoundException("Статья не найдена");
+    return article;
+  }
+
   async create(dto: ArticleDto, userId: string) {
     const createdArticle = await this.prisma.article.create({
       data: {
