@@ -6,9 +6,11 @@ import { AppModule } from "./app.module";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
-  app.setGlobalPrefix("api", {
-    exclude: [{ path: "auth/telegram/redirect", method: RequestMethod.GET }],
-  });
+  app.setGlobalPrefix("api");
+
+  // app.setGlobalPrefix("api", {
+  //   exclude: [{ path: "auth/telegram/redirect", method: RequestMethod.GET }],
+  // });
 
   app.use(cookieParser());
   app.enableCors({
