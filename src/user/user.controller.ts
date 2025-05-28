@@ -22,17 +22,17 @@ export class UserController {
     return this.userService.getById(id);
   }
 
-  // @Auth(Role.PREMIUM)
-  // @Get("premium")
-  // async getPremium() {
-  //   return { text: "Premium content" };
-  // }
+  @Auth(Role.PREMIUM)
+  @Get("premium")
+  async getPremium() {
+    return { text: "Premium content" };
+  }
 
-  // @Auth([Role.ADMIN, Role.MANAGER])
-  // @Get("manager")
-  // async getManagerContent() {
-  //   return { text: "Manager content" };
-  // }
+  @Auth([Role.ADMIN, Role.MANAGER])
+  @Get("manager")
+  async getManagerContent() {
+    return { text: "Manager content" };
+  }
 
   @Auth(Role.ADMIN)
   @Get("list")

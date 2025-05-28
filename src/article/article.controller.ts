@@ -19,20 +19,21 @@ import { CurrentUser } from "@/auth/decorators/user.decorator";
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
+  @Auth()
   @Get()
   async getAll() {
     return this.articleService.getAll();
-  }
-
-  @Get("slug/:slug")
-  async getBySlug(@Param("slug") slug: string) {
-    return this.articleService.getBySlug(slug);
   }
 
   @Auth()
   @Get("by-id/:id")
   async getById(@Param("id") id: string) {
     return this.articleService.getById(id);
+  }
+
+  @Get("slug/:slug")
+  async getBySlug(@Param("slug") slug: string) {
+    return this.articleService.getBySlug(slug);
   }
 
   @Auth()

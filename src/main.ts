@@ -2,12 +2,9 @@ import { RequestMethod } from "@nestjs/common";
 import { NestFactory } from "@nestjs/core";
 import * as cookieParser from "cookie-parser";
 import { AppModule } from "./app.module";
-import { ConfigService } from "@nestjs/config";
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  const config = app.get(ConfigService);
-  const origins = config.getOrThrow<string>("ALLOWED_ORIGIN");
 
   app.setGlobalPrefix("api", {
     exclude: [{ path: "auth/telegram/redirect", method: RequestMethod.GET }],
@@ -15,7 +12,11 @@ async function bootstrap() {
 
   app.use(cookieParser());
   app.enableCors({
-    origin: origins,
+    origin: [
+      "http://localhost:3000",
+      "https://computer-feels-cards-depth.trycloudflare.com",
+      "https://uma.yi-wan.ru",
+    ],
     credentials: true,
     exposedHeaders: "set-cookie",
   });
