@@ -5,6 +5,7 @@ import { UserModule } from "./user/user.module";
 import { TelegramModule } from "./telegram/telegram.module";
 import { ChannelModule } from "./channel/channel.module";
 import { ArticleModule } from "./article/article.module";
+import { ParsingPublicModule } from "./stats/parsing-public/parsing-public.module";
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { ArticleModule } from "./article/article.module";
     ChannelModule,
     TelegramModule,
     ArticleModule,
+    ParsingPublicModule,
   ],
 })
 export class AppModule {}

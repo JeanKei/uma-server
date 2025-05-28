@@ -15,6 +15,9 @@ export class ChannelService {
   async getAll() {
     return this.prisma.telegramChannel.findMany({
       orderBy: { createdAt: "desc" },
+      include: {
+        snapshots: true,
+      },
     });
   }
 
@@ -22,6 +25,9 @@ export class ChannelService {
     return this.prisma.telegramChannel.findMany({
       where: { status: "APPROVED" },
       orderBy: { createdAt: "desc" },
+      include: {
+        snapshots: true,
+      },
     });
   }
 
@@ -29,6 +35,9 @@ export class ChannelService {
     return this.prisma.telegramChannel.findMany({
       where: { isActual: true },
       orderBy: { createdAt: "desc" },
+      include: {
+        snapshots: true,
+      },
     });
   }
 
@@ -36,12 +45,18 @@ export class ChannelService {
     return this.prisma.telegramChannel.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
+      include: {
+        snapshots: true, // важно
+      },
     });
   }
 
   async getById(id: string) {
     const channel = await this.prisma.telegramChannel.findUnique({
       where: { id },
+      include: {
+        snapshots: true, // важно
+      },
     });
 
     if (!channel) throw new NotFoundException("Канал не найден");
