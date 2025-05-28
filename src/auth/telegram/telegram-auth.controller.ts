@@ -14,7 +14,7 @@ export class TelegramAuthController {
     private readonly telegramAuthService: TelegramAuthService,
     private readonly authService: AuthService,
     private readonly refreshTokenService: RefreshTokenService,
-    private readonly configService: ConfigService // ✅ правильно получаем сервис
+    private readonly configService: ConfigService
   ) {
     this.clientBaseUrl = this.configService.getOrThrow("CLIENT_BASE_URL");
   }

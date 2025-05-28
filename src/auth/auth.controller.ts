@@ -1,15 +1,10 @@
 import {
-  Body,
   Controller,
-  Get,
   HttpCode,
   Post,
-  Query,
   Req,
   Res,
   UnauthorizedException,
-  UsePipes,
-  ValidationPipe,
 } from "@nestjs/common";
 import { Request, Response } from "express";
 import { AuthService } from "./auth.service";
