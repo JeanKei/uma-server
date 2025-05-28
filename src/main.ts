@@ -7,8 +7,7 @@ import { ConfigService } from "@nestjs/config";
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   const config = app.get(ConfigService);
-  const rawOrigins = config.getOrThrow<string>("ALLOWED_ORIGIN");
-  const origins = rawOrigins.split(",").map((origin) => origin.trim());
+  const origins = config.getOrThrow<string>("ALLOWED_ORIGIN");
 
   app.setGlobalPrefix("api", {
     exclude: [{ path: "auth/telegram/redirect", method: RequestMethod.GET }],

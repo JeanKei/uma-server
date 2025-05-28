@@ -1,19 +1,23 @@
+import { Controller, Get, Query, Res } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
+import { Response } from "express";
 import { AuthService } from "@/auth/auth.service";
 import { RefreshTokenService } from "@/auth/refresh-token.service";
 import { TelegramAuthService } from "@/auth/telegram/telegram-auth.service";
 import { validateTelegramAuth } from "@/utils/validate-telegram-auth.util";
-import { Controller, Get, Query, Res } from "@nestjs/common";
-import { Response } from "express";
 
 @Controller("auth")
 export class TelegramAuthController {
+  private readonly clientBaseUrl: string;
+
   constructor(
     private readonly telegramAuthService: TelegramAuthService,
     private readonly authService: AuthService,
-    private readonly refreshTokenService: RefreshTokenService
-  ) {}
-
-  private _CLIENT_BASE_URL = "http://localhost:3000/social-auth?accessToken=";
+    private readonly refreshTokenService: RefreshTokenService,
+    private readonly configService: ConfigService // ✅ правильно получаем сервис
+  ) {
+    this.clientBaseUrl = this.configService.getOrThrow("CLIENT_BASE_URL");
+  }
 
   @Get("telegram/redirect")
   async telegramAuthRedirect(
@@ -39,7 +43,7 @@ export class TelegramAuthController {
 
     this.refreshTokenService.addRefreshTokenToResponse(res, refreshToken);
 
-    const redirectUrl = `${this._CLIENT_BASE_URL}${accessToken}`;
+    const redirectUrl = `${this.clientBaseUrl}${accessToken}`;
     return res.redirect(redirectUrl);
   }
 }
