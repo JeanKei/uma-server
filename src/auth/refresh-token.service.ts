@@ -11,8 +11,6 @@ export class RefreshTokenService {
   private readonly sameSite: boolean | "lax" | "strict" | "none";
 
   constructor(private configService: ConfigService) {
-    this.domain =
-      this.configService.get<string>("COOKIE_DOMAIN") || "localhost";
     this.secure = this.configService.get<string>("COOKIE_SECURE") === "true";
     this.sameSite = this.configService.get<string>("COOKIE_SAMESITE") as
       | "lax"
@@ -26,7 +24,6 @@ export class RefreshTokenService {
 
     res.cookie(this.REFRESH_TOKEN_NAME, refreshToken, {
       httpOnly: true,
-      domain: this.domain,
       expires: expiresIn,
       secure: this.secure,
       sameSite: this.sameSite,
@@ -36,7 +33,6 @@ export class RefreshTokenService {
   removeRefreshTokenFromResponse(res: Response) {
     res.cookie(this.REFRESH_TOKEN_NAME, "", {
       httpOnly: true,
-      domain: this.domain,
       expires: new Date(0),
       secure: this.secure,
       sameSite: this.sameSite,
