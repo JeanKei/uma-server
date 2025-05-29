@@ -19,7 +19,6 @@ import { CurrentUser } from "@/auth/decorators/user.decorator";
 export class ArticleController {
   constructor(private readonly articleService: ArticleService) {}
 
-  @Auth()
   @Get()
   async getAll() {
     return this.articleService.getAll();
