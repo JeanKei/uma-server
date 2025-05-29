@@ -16,7 +16,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       "http://localhost:3000",
-      "https://submission-right-heaven-consistent.trycloudflare.com",
+      "https://advisors-motivated-repair-pens.trycloudflare.com",
       "https://uma.yi-wan.ru",
     ],
     credentials: true,
