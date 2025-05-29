@@ -16,7 +16,7 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       "http://localhost:3000",
-      "https://computer-feels-cards-depth.trycloudflare.com",
+      "https://submission-right-heaven-consistent.trycloudflare.com",
       "https://uma.yi-wan.ru",
     ],
     credentials: true,
