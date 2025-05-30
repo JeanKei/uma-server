@@ -35,6 +35,11 @@ export class ChannelController {
     return this.channelService.getIsActual();
   }
 
+  @Get("url/:url")
+  async getByUrl(@Param("url") url: string) {
+    return this.channelService.getByUrl(url);
+  }
+
   @Auth()
   @Get("user")
   async getMyChannels(@CurrentUser("id") userId: string) {

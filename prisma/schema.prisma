@@ -21,7 +21,7 @@ model User {
 
 model TelegramChannel {
   id        String             @id @default(cuid())
-  url       String             @map("channel_url")
+  url       String             @unique @map("channel_url") 
   userId    String             @map("user_id")
   status    ChannelStatus      @default(MODERATION)
   isActual  Boolean            @default(false) @map("is_actual")

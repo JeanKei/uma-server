@@ -41,6 +41,18 @@ export class ChannelService {
     });
   }
 
+  async getByUrl(url: string) {
+    const channel = await this.prisma.telegramChannel.findUnique({
+      where: { url },
+      include: {
+        snapshot: true,
+      },
+    });
+
+    if (!channel) throw new NotFoundException("Канал не найден");
+    return channel;
+  }
+
   async getUserChannels(userId: string) {
     return this.prisma.telegramChannel.findMany({
       where: { userId },
@@ -55,7 +67,7 @@ export class ChannelService {
     const channel = await this.prisma.telegramChannel.findUnique({
       where: { id },
       include: {
-        snapshot: true, // важно
+        snapshot: true,
       },
     });
 
