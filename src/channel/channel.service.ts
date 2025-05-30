@@ -16,7 +16,7 @@ export class ChannelService {
     return this.prisma.telegramChannel.findMany({
       orderBy: { createdAt: "desc" },
       include: {
-        snapshots: true,
+        snapshot: true,
       },
     });
   }
@@ -26,7 +26,7 @@ export class ChannelService {
       where: { status: "APPROVED" },
       orderBy: { createdAt: "desc" },
       include: {
-        snapshots: true,
+        snapshot: true,
       },
     });
   }
@@ -36,7 +36,7 @@ export class ChannelService {
       where: { isActual: true },
       orderBy: { createdAt: "desc" },
       include: {
-        snapshots: true,
+        snapshot: true,
       },
     });
   }
@@ -46,7 +46,7 @@ export class ChannelService {
       where: { userId },
       orderBy: { createdAt: "desc" },
       include: {
-        snapshots: true, // важно
+        snapshot: true, // важно
       },
     });
   }
@@ -55,7 +55,7 @@ export class ChannelService {
     const channel = await this.prisma.telegramChannel.findUnique({
       where: { id },
       include: {
-        snapshots: true, // важно
+        snapshot: true, // важно
       },
     });
 
@@ -126,7 +126,14 @@ export class ChannelService {
 
     return this.prisma.telegramChannel.update({
       where: { id },
-      data: dto,
+      data: {
+        url: dto.url,
+        isActual: dto.isActual,
+        price: dto.price,
+      },
+      include: {
+        snapshot: true,
+      },
     });
   }
 

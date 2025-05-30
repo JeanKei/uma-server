@@ -8,15 +8,88 @@ datasource db {
 }
 
 model User {
-  id    String  @id @default(cuid())
+  id         String            @id @default(cuid())
   name       String?
-  avatarPath String? @map("avatar_path")
-  telegramId String? @map("telegram_id") @unique
-  rights     Role[] @default([USER])
-  channels   TelegramChannel[]
+  avatarPath String?           @map("avatar_path")
+  telegramId String?           @unique @map("telegram_id")
+  rights     Role[]            @default([USER])
   article    Article[]
+  channels   TelegramChannel[]
 
   @@map("users")
+}
+
+model TelegramChannel {
+  id        String             @id @default(cuid())
+  url       String             @map("channel_url")
+  userId    String             @map("user_id")
+  status    ChannelStatus      @default(MODERATION)
+  isActual  Boolean            @default(false) @map("is_actual")
+  price     Int?
+  createdAt DateTime           @default(now()) @map("created_at")
+  updatedAt DateTime           @updatedAt @map("updated_at")
+  snapshot ParsingPublicStat?
+  user      User               @relation(fields: [userId], references: [id])
+
+  @@map("telegram_channels")
+}
+
+model ParsingPublicStat {
+  id          String          @id @default(cuid())
+  channelId   String          @unique @map("channel_id")
+  avatar      String?         @map("avatar")
+  title       String?         @map("title")
+  description String?         @map("description")
+  username    String?         @map("username")
+  isVerified  Boolean         @map("is_verified")
+  subscribers String?         @map("subscribers")
+  photos      String?         @map("photos")
+  videos      String?         @map("videos")
+  files       String?         @map("files")
+  links       String?         @map("links")
+  createdAt   DateTime        @default(now()) @map("created_at")
+  updatedAt   DateTime        @updatedAt @map("updated_at")
+  channel     TelegramChannel @relation(fields: [channelId], references: [id])
+
+  @@map("parsing_public_stat")
+}
+
+model ParsingPublicJob {
+  id          String    @id @default(cuid())
+  startedAt   DateTime  @map("started_at")
+  finishedAt  DateTime? @map("finished_at")
+  parsedCount Int       @default(0) @map("parsed_count")
+
+  @@map("parsing_public_jobs")
+}
+
+model ParsingPublicConfig {
+  id              String   @id @default("singleton")
+  intervalSeconds Int      @default(60) @map("interval_seconds")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("parsing_public_config")
+}
+
+model ModeratorChatSession {
+  moderatorId      String  @id
+  clientId         String
+  pendingRejection String?
+
+  @@map("moderator_chat_sessions")
+}
+
+model Article {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  slug      String   @unique
+  userId    String   @map("user_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("articles")
 }
 
 enum Role {
@@ -26,80 +99,8 @@ enum Role {
   ADMIN
 }
 
-model TelegramChannel {
-  id         String   @id @default(cuid())
-  url        String   @map("channel_url")
-  userId     String   @map("user_id")
-  user       User     @relation(fields: [userId], references: [id])
-  status     ChannelStatus @default(MODERATION)
-  isActual   Boolean  @default(false) @map("is_actual")
-  snapshots  ParsingPublicStat[]
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt      @map("updated_at")
-
-  @@map("telegram_channels")
-}
-
 enum ChannelStatus {
   MODERATION
   APPROVED
   REJECTED
-}
-
-model ParsingPublicStat {
-  id           String          @id @default(cuid())
-  channelId    String          @map("channel_id") @unique
-  channel      TelegramChannel @relation(fields: [channelId], references: [id])
-  avatar       String?         @map("avatar")
-  title        String?         @map("title")
-  description  String?         @map("description")
-  username     String?         @map("username")
-  isVerified   Boolean         @map("is_verified")
-  subscribers  String?         @map("subscribers")
-  photos       String?         @map("photos")
-  videos       String?         @map("videos")
-  files        String?         @map("files")
-  links        String?         @map("links")
-  createdAt    DateTime        @default(now()) @map("created_at")
-  updatedAt    DateTime        @updatedAt       @map("updated_at")
-
-  @@map("parsing_public_stat")
-}
-
-model ParsingPublicJob {
-  id            String    @id @default(cuid())
-  startedAt     DateTime  @map("started_at")
-  finishedAt    DateTime? @map("finished_at")
-  parsedCount   Int       @default(0) @map("parsed_count")
-
-  @@map("parsing_public_jobs")
-}
-
-model ParsingPublicConfig {
-  id              String   @id @default("singleton")
-  intervalSeconds Int      @default(60) @map("interval_seconds")
-  updatedAt       DateTime @updatedAt   @map("updated_at")
-
-  @@map("parsing_public_config")
-}
-
-model ModeratorChatSession {
-  moderatorId     String @id
-  clientId        String
-  pendingRejection String?
-
-  @@map("moderator_chat_sessions")
-}
-
-model Article {
-  id         String   @id @default(cuid())
-  title      String   
-  content    String 
-  slug       String   @unique
-  userId     String   @map("user_id")
-  user       User     @relation(fields: [userId], references: [id])
-  createdAt  DateTime @default(now()) @map("created_at")
-  updatedAt  DateTime @updatedAt      @map("updated_at")
-
-  @@map("articles")
 }
