@@ -21,5 +21,23 @@ export class ChannelDto {
 
   @IsOptional()
   @IsNumber()
-  price: number;
+  price?: number;
+
+  @IsBoolean()
+  format24h: boolean;
+
+  @IsBoolean()
+  format48h: boolean;
+
+  @IsBoolean()
+  format72h: boolean;
+
+  @IsBoolean()
+  formatNative: boolean;
+
+  @IsBoolean()
+  format7d: boolean;
+
+  @IsBoolean()
+  formatRepost: boolean;
 }

@@ -127,9 +127,7 @@ export class ChannelService {
     return this.prisma.telegramChannel.update({
       where: { id },
       data: {
-        url: dto.url,
-        isActual: dto.isActual,
-        price: dto.price,
+        ...dto,
       },
       include: {
         snapshot: true,
