@@ -20,7 +20,7 @@ export class ModerationActions {
     const messageId = ctx.callbackQuery?.message?.message_id;
     if (!chatId || !messageId) return;
 
-    const channel = await this.prisma.telegramChannel.findUnique({
+    const channel = await this.prisma.channel.findUnique({
       where: { id: channelId },
       select: { url: true, userId: true },
     });
@@ -34,7 +34,7 @@ export class ModerationActions {
     const clientName = user?.name ?? "Клиент";
 
     if (action === "approve") {
-      await this.prisma.telegramChannel.update({
+      await this.prisma.channel.update({
         where: { id: channelId },
         data: { status: "APPROVED" },
       });
@@ -86,7 +86,7 @@ export class ModerationActions {
 
     const reason = message.text;
 
-    const channel = await this.prisma.telegramChannel.findUnique({
+    const channel = await this.prisma.channel.findUnique({
       where: { id: session.pendingRejection },
       select: { url: true, userId: true },
     });
@@ -97,7 +97,7 @@ export class ModerationActions {
     });
 
     // Обновляем статус
-    await this.prisma.telegramChannel.update({
+    await this.prisma.channel.update({
       where: { id: session.pendingRejection },
       data: { status: "REJECTED" },
     });

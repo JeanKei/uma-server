@@ -13,39 +13,47 @@ export class ChannelService {
   ) {}
 
   async getAll() {
-    return this.prisma.telegramChannel.findMany({
+    return this.prisma.channel.findMany({
       orderBy: { createdAt: "desc" },
       include: {
         snapshot: true,
+        categoriesChannel: true,
+        statInitial: true,
       },
     });
   }
 
   async getApproved() {
-    return this.prisma.telegramChannel.findMany({
+    return this.prisma.channel.findMany({
       where: { status: "APPROVED" },
       orderBy: { createdAt: "desc" },
       include: {
         snapshot: true,
+        categoriesChannel: true,
+        statInitial: true,
       },
     });
   }
 
   async getIsActual() {
-    return this.prisma.telegramChannel.findMany({
+    return this.prisma.channel.findMany({
       where: { isActual: true },
       orderBy: { createdAt: "desc" },
       include: {
         snapshot: true,
+        categoriesChannel: true,
+        statInitial: true,
       },
     });
   }
 
   async getByUrl(url: string) {
-    const channel = await this.prisma.telegramChannel.findUnique({
+    const channel = await this.prisma.channel.findUnique({
       where: { url },
       include: {
         snapshot: true,
+        categoriesChannel: true,
+        statInitial: true,
       },
     });
 
@@ -54,20 +62,24 @@ export class ChannelService {
   }
 
   async getUserChannels(userId: string) {
-    return this.prisma.telegramChannel.findMany({
+    return this.prisma.channel.findMany({
       where: { userId },
       orderBy: { createdAt: "desc" },
       include: {
-        snapshot: true, // важно
+        snapshot: true,
+        categoriesChannel: true,
+        statInitial: true,
       },
     });
   }
 
   async getById(id: string) {
-    const channel = await this.prisma.telegramChannel.findUnique({
+    const channel = await this.prisma.channel.findUnique({
       where: { id },
       include: {
         snapshot: true,
+        categoriesChannel: true,
+        statInitial: true,
       },
     });
 
@@ -76,7 +88,7 @@ export class ChannelService {
   }
 
   async create(dto: ChannelDto, userId: string) {
-    const createdChannel = await this.prisma.telegramChannel.create({
+    const createdChannel = await this.prisma.channel.create({
       data: {
         url: dto.url,
         userId,
@@ -136,13 +148,15 @@ export class ChannelService {
   async update(id: string, dto: ChannelDto) {
     await this.getById(id);
 
-    return this.prisma.telegramChannel.update({
+    return this.prisma.channel.update({
       where: { id },
       data: {
         ...dto,
       },
       include: {
         snapshot: true,
+        categoriesChannel: true,
+        statInitial: true,
       },
     });
   }
@@ -153,7 +167,7 @@ export class ChannelService {
     // ✅ Отправляем уведомления в Telegram
     await this.telegram.notifyChannelDeleted(id);
 
-    return this.prisma.telegramChannel.delete({
+    return this.prisma.channel.delete({
       where: { id },
     });
   }

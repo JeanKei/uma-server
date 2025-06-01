@@ -8,73 +8,112 @@ datasource db {
 }
 
 model User {
-  id         String            @id @default(cuid())
+  id         String    @id @default(cuid())
   name       String?
-  avatarPath String?           @map("avatar_path")
-  telegramId String?           @unique @map("telegram_id")
-  rights     Role[]            @default([USER])
+  avatarPath String?   @map("avatar_path")
+  telegramId String?   @unique @map("telegram_id")
+  rights     Role[]    @default([USER])
   article    Article[]
-  channels   TelegramChannel[]
+  channels   Channel[]
 
   @@map("users")
 }
 
-model TelegramChannel {
-  id        String             @id @default(cuid())
-  url       String             @unique @map("channel_url") 
-  userId    String             @map("user_id")
-  status    ChannelStatus      @default(MODERATION)
-  isActual  Boolean            @default(false) @map("is_actual")
-  price     Int?
-  format24h  Boolean            @default(true) @map("format_24h")
-  format48h  Boolean            @default(true) @map("format_48h")
-  format72h  Boolean            @default(true) @map("format_72h")
-  formatNative  Boolean         @default(true) @map("format_native")
-  format7d  Boolean             @default(true) @map("format_7d")
-  formatRepost  Boolean         @default(true) @map("format_repost")
-  createdAt DateTime           @default(now()) @map("created_at")
-  updatedAt DateTime           @updatedAt @map("updated_at")
-  snapshot ParsingPublicStat?
-  user      User               @relation(fields: [userId], references: [id])
+model Channel {
+  id                String              @id @default(cuid())
+  url               String              @unique @map("channel_url")
+  userId            String?             @map("user_id")
+  status            ChannelStatus       @default(MODERATION)
+  isActual          Boolean             @default(false) @map("is_actual")
+  price             Int?
+  format24h         Boolean             @default(true) @map("format_24h")
+  format48h         Boolean             @default(true) @map("format_48h")
+  format72h         Boolean             @default(true) @map("format_72h")
+  formatNative      Boolean             @default(true) @map("format_native")
+  format7d          Boolean             @default(true) @map("format_7d")
+  formatRepost      Boolean             @default(true) @map("format_repost")
+  createdAt         DateTime            @default(now()) @map("created_at")
+  updatedAt         DateTime            @updatedAt @map("updated_at")
+  categoriesChannel CategoriesChannel[]
+  user              User?               @relation(fields: [userId], references: [id])
+  statInitial       StatInitial?
+  snapshot          StatPublic?
 
-  @@map("telegram_channels")
+  @@map("channels")
 }
 
-model ParsingPublicStat {
-  id          String          @id @default(cuid())
-  channelId   String          @unique @map("channel_id")
-  avatar      String?         @map("avatar")
-  title       String?         @map("title")
-  description String?         @map("description")
-  username    String?         @map("username")
-  isVerified  Boolean         @map("is_verified")
-  subscribers Int?         @map("subscribers")
-  photos      Int?         @map("photos")
-  videos      Int?         @map("videos")
-  files       Int?         @map("files")
-  links       Int?         @map("links")
-  createdAt   DateTime        @default(now()) @map("created_at")
-  updatedAt   DateTime        @updatedAt @map("updated_at")
-  channel     TelegramChannel @relation(fields: [channelId], references: [id])
+model StatPublic {
+  id          String   @id @default(cuid())
+  channelId   String   @unique @map("channel_id")
+  avatar      String?  @map("avatar")
+  title       String?  @map("title")
+  description String?  @map("description")
+  username    String?  @map("username")
+  isVerified  Boolean  @map("is_verified")
+  subscribers Int?     @map("subscribers")
+  photos      Int?     @map("photos")
+  videos      Int?     @map("videos")
+  files       Int?     @map("files")
+  links       Int?     @map("links")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  channel     Channel  @relation(fields: [channelId], references: [id])
 
-  @@map("parsing_public_stat")
+  @@map("stat_public")
 }
 
-model ParsingPublicJob {
+model StatPublicJob {
   id          String    @id @default(cuid())
   startedAt   DateTime  @map("started_at")
   finishedAt  DateTime? @map("finished_at")
   parsedCount Int       @default(0) @map("parsed_count")
 
-  @@map("parsing_public_jobs")
+  @@map("stat_public_job")
 }
 
-model ParsingPublicConfig {
+model StatPublicConfig {
   id              String   @id @default("singleton")
   intervalSeconds Int      @default(60) @map("interval_seconds")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
-  @@map("parsing_public_config")
+  @@map("stat_public_config")
+}
+
+model StatInitial {
+  id          String   @id @default(cuid())
+  channelId   String   @unique @map("channel_id")
+  title       String?  @map("title")
+  description String?  @map("description")
+  subscribers Int?     @map("subscribers")
+  gender      String?  @map("gender")
+  view        Int?     @map("view")
+  er          Float?   @map("er")
+  cpv         Float?   @map("cpv")
+  price       Int?     @map("price")
+  imgSrc      String?  @map("img_src")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  channel     Channel  @relation(fields: [channelId], references: [id])
+
+  @@map("stat_initial")
+}
+
+model Category {
+  id                String              @id @default(cuid())
+  name              String              @unique
+  categoriesChannel CategoriesChannel[]
+
+  @@map("categories")
+}
+
+model CategoriesChannel {
+  channelId  String
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id])
+  channel    Channel  @relation(fields: [channelId], references: [id])
+
+  @@id([channelId, categoryId])
+  @@map("categories_channels")
 }
 
 model ModeratorChatSession {

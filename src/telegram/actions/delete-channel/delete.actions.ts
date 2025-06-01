@@ -12,7 +12,7 @@ export class DeleteChannelActions {
   ) {}
 
   async notifyOnDelete(channelId: string) {
-    const channel = await this.prisma.telegramChannel.findUnique({
+    const channel = await this.prisma.channel.findUnique({
       where: { id: channelId },
       select: {
         url: true,
