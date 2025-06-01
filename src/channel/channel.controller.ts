@@ -7,6 +7,7 @@ import {
   Param,
   Post,
   Patch,
+  Query,
   UsePipes,
   ValidationPipe,
 } from "@nestjs/common";
@@ -21,13 +22,20 @@ export class ChannelController {
 
   @Auth()
   @Get()
-  async getAll() {
-    return this.channelService.getAll();
+  async getAll(@Query("page") page?: string, @Query("limit") limit?: string) {
+    const pageNumber = parseInt(page ?? "1", 10);
+    const limitNumber = parseInt(limit ?? "10", 10);
+    return this.channelService.getAll(pageNumber, limitNumber);
   }
 
   @Get("approved")
-  async getApproved() {
-    return this.channelService.getApproved();
+  async getApproved(
+    @Query("page") page?: string,
+    @Query("limit") limit?: string
+  ) {
+    const pageNumber = parseInt(page ?? "1", 10);
+    const limitNumber = parseInt(limit ?? "10", 10);
+    return this.channelService.getApproved(pageNumber, limitNumber);
   }
 
   @Get("actual")

@@ -12,27 +12,51 @@ export class ChannelService {
     private readonly telegram: TelegramService
   ) {}
 
-  async getAll() {
-    return this.prisma.channel.findMany({
-      orderBy: { createdAt: "desc" },
-      include: {
-        snapshot: true,
-        categoriesChannel: true,
-        statInitial: true,
-      },
-    });
+  async getAll(page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+
+    const [items, total] = await Promise.all([
+      this.prisma.channel.findMany({
+        skip,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+        include: {
+          snapshot: true,
+          categoriesChannel: true,
+          statInitial: true,
+        },
+      }),
+      this.prisma.channel.count(),
+    ]);
+
+    const hasMore = page * limit < total;
+
+    return { items, total, page, limit, hasMore };
   }
 
-  async getApproved() {
-    return this.prisma.channel.findMany({
-      where: { status: "APPROVED" },
-      orderBy: { createdAt: "desc" },
-      include: {
-        snapshot: true,
-        categoriesChannel: true,
-        statInitial: true,
-      },
-    });
+  async getApproved(page = 1, limit = 10) {
+    const skip = (page - 1) * limit;
+
+    const [items, total] = await Promise.all([
+      this.prisma.channel.findMany({
+        where: { status: "APPROVED" },
+        skip,
+        take: limit,
+        orderBy: { createdAt: "desc" },
+        include: {
+          snapshot: true,
+          categoriesChannel: true,
+          statInitial: true,
+        },
+      }),
+      this.prisma.channel.count({
+        where: { status: "APPROVED" },
+      }),
+    ]);
+
+    const hasMore = page * limit < total;
+
+    return { items, total, page, limit, hasMore };
   }
 
   async getIsActual() {
@@ -101,7 +125,6 @@ export class ChannelService {
       select: { name: true, telegramId: true },
     });
 
-    // ✅ Уведомляем клиента
     if (user?.telegramId) {
       await this.telegram.sendMessage(
         Number(user.telegramId),
@@ -110,7 +133,6 @@ export class ChannelService {
       );
     }
 
-    // ✅ Кнопки модерации
     const inlineKeyboard = Markup.inlineKeyboard([
       [
         Markup.button.callback(
@@ -130,7 +152,6 @@ export class ChannelService {
       ],
     ]);
 
-    // ✅ Уведомляем модераторов
     for (const modId of TELEGRAM_MODERATORS) {
       await this.telegram.sendMessage(
         modId,
@@ -164,7 +185,6 @@ export class ChannelService {
   async delete(id: string) {
     const channel = await this.getById(id);
 
-    // ✅ Отправляем уведомления в Telegram
     await this.telegram.notifyChannelDeleted(id);
 
     return this.prisma.channel.delete({
