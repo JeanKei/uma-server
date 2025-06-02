@@ -6,11 +6,17 @@ import { TelegramModule } from "./telegram/telegram.module";
 import { ChannelModule } from "./channel/channel.module";
 import { ArticleModule } from "./article/article.module";
 import { StatPublicModule } from "./stats/stat-public/stat-public.module";
+import { ServeStaticModule } from "@nestjs/serve-static";
+import { join } from "path";
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), "uploads"),
+      serveRoot: "/uploads",
     }),
     AuthModule,
     UserModule,

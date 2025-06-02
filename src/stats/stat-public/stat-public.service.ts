@@ -15,6 +15,7 @@ import {
   parseFiles,
   parseLinks,
 } from "./components";
+import { downloadAndSaveAvatar } from "./components/scrapeChannelInfo";
 
 @Injectable()
 export class StatPublicService {
@@ -95,8 +96,13 @@ export class StatPublicService {
 
       const $ = cheerio.load(response.data);
 
+      const avatarUrl = parseAvatar($); // Это Telegram CDN URL
+      const avatarPath = avatarUrl
+        ? await downloadAndSaveAvatar(avatarUrl, channelUrl)
+        : null;
+
       return {
-        avatar: parseAvatar($),
+        avatar: avatarPath, // теперь это путь к локальному файлу
         title: parseTitle($),
         description: parseDescription($),
         username: parseUsername($),
