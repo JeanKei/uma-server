@@ -7,7 +7,6 @@ import {
   parseAvatar,
   parseTitle,
   parseDescription,
-  parseUsername,
   parseIsVerified,
   parseSubscribers,
   parsePhotos,
@@ -102,10 +101,9 @@ export class StatPublicService {
         : null;
 
       return {
-        avatar: avatarPath, // теперь это путь к локальному файлу
+        avatar: avatarPath,
         title: parseTitle($),
         description: parseDescription($),
-        username: parseUsername($),
         isVerified: parseIsVerified($),
         subscribers: parseSubscribers($),
         photos: parsePhotos($),

@@ -37,7 +37,7 @@ model Channel {
   categoriesChannel CategoriesChannel[]
   user              User?               @relation(fields: [userId], references: [id])
   statInitial       StatInitial?
-  snapshot          StatPublic?
+  statPublic        StatPublic?
 
   @@map("channels")
 }
@@ -48,7 +48,6 @@ model StatPublic {
   avatar      String?  @map("avatar")
   title       String?  @map("title")
   description String?  @map("description")
-  username    String?  @map("username")
   isVerified  Boolean  @map("is_verified")
   subscribers Int?     @map("subscribers")
   photos      Int?     @map("photos")

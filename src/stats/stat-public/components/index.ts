@@ -1,6 +1,5 @@
 export * from "./title.parser";
 export * from "./description.parser";
-export * from "./username.parser";
 export * from "./is-verified.parser";
 export * from "./subscribers.parser";
 export * from "./photos.parser";
