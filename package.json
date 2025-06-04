@@ -19,7 +19,9 @@
     "test:debug": "node --inspect-brk -r tsconfig-paths/register -r ts-node/register node_modules/.bin/jest --runInBand",
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "email": "emails dev",
-    "ngrok": "ngrok http 4200"
+    "ngrok": "ngrok http 4200",
+    "seed:initial": "ts-node prisma/seeds/initial-channels/seed-initial.ts",
+    "seed:descriptions": "ts-node prisma/seeds/descriptions-channels/seed-descriptions.ts"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^2.0.2",
@@ -110,8 +112,5 @@
   },
   "resolutions": {
     "string-width": "4.2.3"
-  },
-  "prisma": {
-    "seed": "ts-node prisma/seeds/initial-channels/seed.ts"
   }
 }
