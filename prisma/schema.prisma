@@ -22,6 +22,8 @@ model User {
 model Channel {
   id                String              @id @default(cuid())
   url               String              @unique @map("channel_url")
+  title             String?             
+  description       String?             
   userId            String?             @map("user_id")
   status            ChannelStatus       @default(MODERATION)
   isActual          Boolean             @default(false) @map("is_actual")
@@ -45,15 +47,15 @@ model Channel {
 model StatPublic {
   id          String   @id @default(cuid())
   channelId   String   @unique @map("channel_id")
-  avatar      String?  @map("avatar")
-  title       String?  @map("title")
-  description String?  @map("description")
+  avatar      String?  
+  title       String? 
+  description String?  
   isVerified  Boolean  @map("is_verified")
-  subscribers Int?     @map("subscribers")
-  photos      Int?     @map("photos")
-  videos      Int?     @map("videos")
-  files       Int?     @map("files")
-  links       Int?     @map("links")
+  subscribers Int?    
+  photos      Int?     
+  videos      Int?     
+  files       Int?     
+  links       Int?     
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   channel     Channel  @relation(fields: [channelId], references: [id])
@@ -81,14 +83,14 @@ model StatPublicConfig {
 model StatInitial {
   id          String   @id @default(cuid())
   channelId   String   @unique @map("channel_id")
-  title       String?  @map("title")
-  description String?  @map("description")
-  subscribers Int?     @map("subscribers")
-  gender      String?  @map("gender")
-  view        Int?     @map("view")
-  er          Float?   @map("er")
-  cpv         Float?   @map("cpv")
-  price       Int?     @map("price")
+  title       String?  
+  description String?  
+  subscribers Int?    
+  gender      String?  
+  view        Int?     
+  er          Float?   
+  cpv         Float?   
+  price       Int?     
   imgSrc      String?  @map("img_src")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")

@@ -114,7 +114,7 @@ export class ChannelService {
   async create(dto: ChannelDto, userId: string) {
     const createdChannel = await this.prisma.channel.create({
       data: {
-        url: dto.url,
+        ...dto,
         userId,
         status: "MODERATION",
       },

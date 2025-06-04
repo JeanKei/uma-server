@@ -7,13 +7,19 @@ import {
 } from "class-validator";
 
 export class ChannelDto {
-  @IsString({
-    message: "url обязательно",
-  })
+  @IsString()
   @IsNotEmpty({
     message: "Поле не может быть пустым",
   })
   url: string;
+
+  @IsOptional()
+  @IsString()
+  title?: string;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
 
   @IsOptional()
   @IsBoolean()
