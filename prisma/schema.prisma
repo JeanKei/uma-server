@@ -22,8 +22,8 @@ model User {
 model Channel {
   id                String              @id @default(cuid())
   url               String              @unique @map("channel_url")
-  title             String?             
-  description       String?             
+  title             String?
+  description       String?
   userId            String?             @map("user_id")
   status            ChannelStatus       @default(MODERATION)
   isActual          Boolean             @default(false) @map("is_actual")
@@ -47,15 +47,15 @@ model Channel {
 model StatPublic {
   id          String   @id @default(cuid())
   channelId   String   @unique @map("channel_id")
-  avatar      String?  
-  title       String? 
-  description String?  
+  avatar      String?
+  title       String?
+  description String?
   isVerified  Boolean  @map("is_verified")
-  subscribers Int?    
-  photos      Int?     
-  videos      Int?     
-  files       Int?     
-  links       Int?     
+  subscribers Int?
+  photos      Int?
+  videos      Int?
+  files       Int?
+  links       Int?
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   channel     Channel  @relation(fields: [channelId], references: [id])
@@ -83,13 +83,13 @@ model StatPublicConfig {
 model StatInitial {
   id          String   @id @default(cuid())
   channelId   String   @unique @map("channel_id")
-  title       String?  
-  subscribers Int?    
-  gender      String?  
-  view        Int?     
-  er          Float?   
-  cpv         Float?   
-  price       Int?     
+  title       String?
+  subscribers Int?
+  gender      String?
+  view        Int?
+  er          Float?
+  cpv         Float?
+  price       Int?
   imgSrc      String?  @map("img_src")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
