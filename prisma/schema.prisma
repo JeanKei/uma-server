@@ -85,7 +85,7 @@ model StatInitial {
   channelId   String   @unique @map("channel_id")
   title       String?
   subscribers Int?
-  gender      String?
+  gender      Int?
   view        Int?
   er          Float?
   cpv         Float?

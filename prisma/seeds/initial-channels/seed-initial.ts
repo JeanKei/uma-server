@@ -90,7 +90,7 @@ async function main() {
       const needsUpdate =
         existingStat.title !== title ||
         existingStat.subscribers !== Number(subscribers) ||
-        existingStat.gender !== gender ||
+        existingStat.gender !== Number(gender) ||
         existingStat.view !== Number(view) ||
         existingStat.er !== parseFloat(ER) ||
         existingStat.cpv !== parseFloat(CPV) ||
@@ -103,7 +103,7 @@ async function main() {
           data: {
             title,
             subscribers: Number(subscribers) || undefined,
-            gender,
+            gender: Number(gender) || undefined,
             view: Number(view) || undefined,
             er: parseFloat(ER) || undefined,
             cpv: parseFloat(CPV) || undefined,

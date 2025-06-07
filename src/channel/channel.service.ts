@@ -4,6 +4,11 @@ import { ChannelDto } from "./dto/channel.dto";
 import { TelegramService } from "@/telegram/telegram.service";
 import { TELEGRAM_MODERATORS } from "@/telegram/telegram.constants";
 import { Markup } from "telegraf";
+import {
+  buildChannelFilter,
+  ChannelFilterInput,
+} from "./filters/channel.filter";
+import { ChannelStatus } from "@prisma/client";
 
 @Injectable()
 export class ChannelService {
@@ -12,11 +17,60 @@ export class ChannelService {
     private readonly telegram: TelegramService
   ) {}
 
-  async getAll(page = 1, limit = 10) {
+  // async getAll(page = 1, limit = 10) {
+  //   const skip = (page - 1) * limit;
+
+  //   const [items, total] = await Promise.all([
+  //     this.prisma.channel.findMany({
+  //       skip,
+  //       take: limit,
+  //       orderBy: { createdAt: "desc" },
+  //       include: {
+  //         statPublic: true,
+  //         categoriesChannel: true,
+  //         statInitial: true,
+  //       },
+  //     }),
+  //     this.prisma.channel.count(),
+  //   ]);
+
+  //   const hasMore = page * limit < total;
+
+  //   return { items, total, page, limit, hasMore };
+  // }
+
+  // async getApproved(page = 1, limit = 10) {
+  //   const skip = (page - 1) * limit;
+
+  //   const [items, total] = await Promise.all([
+  //     this.prisma.channel.findMany({
+  //       where: { status: "APPROVED" },
+  //       skip,
+  //       take: limit,
+  //       orderBy: { createdAt: "desc" },
+  //       include: {
+  //         statPublic: true,
+  //         categoriesChannel: true,
+  //         statInitial: true,
+  //       },
+  //     }),
+  //     this.prisma.channel.count({
+  //       where: { status: "APPROVED" },
+  //     }),
+  //   ]);
+
+  //   const hasMore = page * limit < total;
+
+  //   return { items, total, page, limit, hasMore };
+  // }
+
+  async getAll(page = 1, limit = 10, filter: ChannelFilterInput = {}) {
     const skip = (page - 1) * limit;
+    const where = buildChannelFilter(filter);
 
     const [items, total] = await Promise.all([
       this.prisma.channel.findMany({
+        where,
         skip,
         take: limit,
         orderBy: { createdAt: "desc" },
@@ -26,20 +80,26 @@ export class ChannelService {
           statInitial: true,
         },
       }),
-      this.prisma.channel.count(),
+      this.prisma.channel.count({ where }),
     ]);
 
     const hasMore = page * limit < total;
-
     return { items, total, page, limit, hasMore };
   }
 
-  async getApproved(page = 1, limit = 10) {
+  async getApproved(page = 1, limit = 10, filter: ChannelFilterInput = {}) {
     const skip = (page - 1) * limit;
+
+    const filterWhere = buildChannelFilter(filter);
+
+    const where = {
+      ...filterWhere,
+      status: ChannelStatus.APPROVED,
+    };
 
     const [items, total] = await Promise.all([
       this.prisma.channel.findMany({
-        where: { status: "APPROVED" },
+        where,
         skip,
         take: limit,
         orderBy: { createdAt: "desc" },
@@ -49,13 +109,10 @@ export class ChannelService {
           statInitial: true,
         },
       }),
-      this.prisma.channel.count({
-        where: { status: "APPROVED" },
-      }),
+      this.prisma.channel.count({ where }),
     ]);
 
     const hasMore = page * limit < total;
-
     return { items, total, page, limit, hasMore };
   }
 
