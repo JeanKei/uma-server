@@ -33,13 +33,21 @@ export class ChannelController {
     @Query("minSubscribers") minSubscribers?: string,
     @Query("maxSubscribers") maxSubscribers?: string,
     @Query("minView") minView?: string,
-    @Query("maxView") maxView?: string
+    @Query("maxView") maxView?: string,
+    @Query("minEr") minEr?: string,
+    @Query("maxEr") maxEr?: string,
+    @Query("minCpv") minCpv?: string,
+    @Query("maxCpv") maxCpv?: string
   ) {
     const filter: ChannelFilterInput = {
       minSubscribers: minSubscribers ? Number(minSubscribers) : undefined,
       maxSubscribers: maxSubscribers ? Number(maxSubscribers) : undefined,
       minView: minView ? Number(minView) : undefined,
       maxView: maxView ? Number(maxView) : undefined,
+      minEr: minEr ? Number(minEr) : undefined,
+      maxEr: maxEr ? Number(maxEr) : undefined,
+      minCpv: minCpv ? Number(minCpv) : undefined,
+      maxCpv: maxCpv ? Number(maxCpv) : undefined,
     };
     return this.channelService.getAll(Number(page), Number(limit), filter);
   }
@@ -51,13 +59,21 @@ export class ChannelController {
     @Query("minSubscribers") minSubscribers?: string,
     @Query("maxSubscribers") maxSubscribers?: string,
     @Query("minView") minView?: string,
-    @Query("maxView") maxView?: string
+    @Query("maxView") maxView?: string,
+    @Query("minEr") minEr?: string,
+    @Query("maxEr") maxEr?: string,
+    @Query("minCpv") minCpv?: string,
+    @Query("maxCpv") maxCpv?: string
   ) {
     const filter: ChannelFilterInput = {
       minSubscribers: minSubscribers ? Number(minSubscribers) : undefined,
       maxSubscribers: maxSubscribers ? Number(maxSubscribers) : undefined,
       minView: minView ? Number(minView) : undefined,
       maxView: maxView ? Number(maxView) : undefined,
+      minEr: minEr ? Number(minEr) : undefined,
+      maxEr: maxEr ? Number(maxEr) : undefined,
+      minCpv: minCpv ? Number(minCpv) : undefined,
+      maxCpv: maxCpv ? Number(maxCpv) : undefined,
     };
     return this.channelService.getApproved(Number(page), Number(limit), filter);
   }

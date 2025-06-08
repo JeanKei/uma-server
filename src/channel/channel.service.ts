@@ -20,12 +20,16 @@ export class ChannelService {
       _max: {
         subscribers: true,
         view: true,
+        er: true,
+        cpv: true,
       },
     });
 
     return {
       maxSubscribers: statInitialMax._max.subscribers || 0,
       maxView: statInitialMax._max.view || 0,
+      maxEr: statInitialMax._max.er || 0,
+      maxCpv: statInitialMax._max.cpv || 0,
     };
   }
 
