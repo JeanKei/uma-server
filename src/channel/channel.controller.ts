@@ -15,7 +15,6 @@ import { ChannelService } from "./channel.service";
 import { ChannelDto } from "./dto/channel.dto";
 import { Auth } from "src/auth/decorators/auth.decorator";
 import { CurrentUser } from "@/auth/decorators/user.decorator";
-import { ChannelFilterDto } from "./dto/channel-filter.dto";
 import { ChannelFilterInput } from "./filters/channel-filter.types";
 
 @Controller("channel")
@@ -32,11 +31,15 @@ export class ChannelController {
     @Query("page") page: string = "1",
     @Query("limit") limit: string = "10",
     @Query("minSubscribers") minSubscribers?: string,
-    @Query("maxSubscribers") maxSubscribers?: string
+    @Query("maxSubscribers") maxSubscribers?: string,
+    @Query("minView") minView?: string,
+    @Query("maxView") maxView?: string
   ) {
     const filter: ChannelFilterInput = {
       minSubscribers: minSubscribers ? Number(minSubscribers) : undefined,
       maxSubscribers: maxSubscribers ? Number(maxSubscribers) : undefined,
+      minView: minView ? Number(minView) : undefined,
+      maxView: maxView ? Number(maxView) : undefined,
     };
     return this.channelService.getAll(Number(page), Number(limit), filter);
   }
@@ -46,11 +49,15 @@ export class ChannelController {
     @Query("page") page: string = "1",
     @Query("limit") limit: string = "10",
     @Query("minSubscribers") minSubscribers?: string,
-    @Query("maxSubscribers") maxSubscribers?: string
+    @Query("maxSubscribers") maxSubscribers?: string,
+    @Query("minView") minView?: string,
+    @Query("maxView") maxView?: string
   ) {
     const filter: ChannelFilterInput = {
       minSubscribers: minSubscribers ? Number(minSubscribers) : undefined,
       maxSubscribers: maxSubscribers ? Number(maxSubscribers) : undefined,
+      minView: minView ? Number(minView) : undefined,
+      maxView: maxView ? Number(maxView) : undefined,
     };
     return this.channelService.getApproved(Number(page), Number(limit), filter);
   }

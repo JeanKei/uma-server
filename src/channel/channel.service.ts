@@ -19,11 +19,13 @@ export class ChannelService {
     const statInitialMax = await this.prisma.statInitial.aggregate({
       _max: {
         subscribers: true,
+        view: true,
       },
     });
 
     return {
       maxSubscribers: statInitialMax._max.subscribers || 0,
+      maxView: statInitialMax._max.view || 0,
     };
   }
 

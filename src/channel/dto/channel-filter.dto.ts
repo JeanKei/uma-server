@@ -24,11 +24,11 @@ export class ChannelFilterDto {
 
   @IsOptional()
   @Type(() => Number)
-  minViews?: number;
+  minView?: number;
 
   @IsOptional()
   @Type(() => Number)
-  maxViews?: number;
+  maxView?: number;
 
   @IsOptional()
   @Type(() => Number)
