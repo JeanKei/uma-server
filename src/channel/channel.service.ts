@@ -4,11 +4,9 @@ import { ChannelDto } from "./dto/channel.dto";
 import { TelegramService } from "@/telegram/telegram.service";
 import { TELEGRAM_MODERATORS } from "@/telegram/telegram.constants";
 import { Markup } from "telegraf";
-import {
-  buildChannelFilter,
-  ChannelFilterInput,
-} from "./filters/channel.filter";
+import { buildChannelFilter } from "./filters/channel-filter";
 import { ChannelStatus } from "@prisma/client";
+import { ChannelFilterInput } from "./filters/channel-filter.types";
 
 @Injectable()
 export class ChannelService {
@@ -17,56 +15,24 @@ export class ChannelService {
     private readonly telegram: TelegramService
   ) {}
 
-  // async getAll(page = 1, limit = 10) {
-  //   const skip = (page - 1) * limit;
+  async getMaxValues() {
+    const statInitialMax = await this.prisma.statInitial.aggregate({
+      _max: {
+        subscribers: true,
+      },
+    });
 
-  //   const [items, total] = await Promise.all([
-  //     this.prisma.channel.findMany({
-  //       skip,
-  //       take: limit,
-  //       orderBy: { createdAt: "desc" },
-  //       include: {
-  //         statPublic: true,
-  //         categoriesChannel: true,
-  //         statInitial: true,
-  //       },
-  //     }),
-  //     this.prisma.channel.count(),
-  //   ]);
-
-  //   const hasMore = page * limit < total;
-
-  //   return { items, total, page, limit, hasMore };
-  // }
-
-  // async getApproved(page = 1, limit = 10) {
-  //   const skip = (page - 1) * limit;
-
-  //   const [items, total] = await Promise.all([
-  //     this.prisma.channel.findMany({
-  //       where: { status: "APPROVED" },
-  //       skip,
-  //       take: limit,
-  //       orderBy: { createdAt: "desc" },
-  //       include: {
-  //         statPublic: true,
-  //         categoriesChannel: true,
-  //         statInitial: true,
-  //       },
-  //     }),
-  //     this.prisma.channel.count({
-  //       where: { status: "APPROVED" },
-  //     }),
-  //   ]);
-
-  //   const hasMore = page * limit < total;
-
-  //   return { items, total, page, limit, hasMore };
-  // }
+    return {
+      maxSubscribers: statInitialMax._max.subscribers || 0,
+    };
+  }
 
   async getAll(page = 1, limit = 10, filter: ChannelFilterInput = {}) {
     const skip = (page - 1) * limit;
-    const where = buildChannelFilter(filter);
+    const where = await buildChannelFilter(filter, this);
+
+    console.log("Received filter:", filter);
+    console.log("Prisma query where:", JSON.stringify(where, null, 2));
 
     const [items, total] = await Promise.all([
       this.prisma.channel.findMany({
@@ -82,6 +48,8 @@ export class ChannelService {
       }),
       this.prisma.channel.count({ where }),
     ]);
+
+    console.log("Query result:", { items: items.length, total });
 
     const hasMore = page * limit < total;
     return { items, total, page, limit, hasMore };
@@ -90,12 +58,15 @@ export class ChannelService {
   async getApproved(page = 1, limit = 10, filter: ChannelFilterInput = {}) {
     const skip = (page - 1) * limit;
 
-    const filterWhere = buildChannelFilter(filter);
+    const filterWhere = await buildChannelFilter(filter, this);
 
     const where = {
       ...filterWhere,
       status: ChannelStatus.APPROVED,
     };
+
+    console.log("Received filter:", filter);
+    console.log("Prisma query where:", JSON.stringify(where, null, 2));
 
     const [items, total] = await Promise.all([
       this.prisma.channel.findMany({
@@ -111,6 +82,8 @@ export class ChannelService {
       }),
       this.prisma.channel.count({ where }),
     ]);
+
+    console.log("Query result:", { items: items.length, total });
 
     const hasMore = page * limit < total;
     return { items, total, page, limit, hasMore };

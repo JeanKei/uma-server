@@ -20,43 +20,7 @@ export class ChannelFilterDto {
 
   @IsOptional()
   @Type(() => Number)
-  minPhotos?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  maxPhotos?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  minVideos?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  maxVideos?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  minFiles?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  maxFiles?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  minLinks?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  maxLinks?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  genderCenter?: number;
-
-  @IsOptional()
-  @Type(() => Number)
-  genderDelta?: number;
+  minGenderM?: number;
 
   @IsOptional()
   @Type(() => Number)

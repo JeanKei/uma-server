@@ -16,52 +16,43 @@ import { ChannelDto } from "./dto/channel.dto";
 import { Auth } from "src/auth/decorators/auth.decorator";
 import { CurrentUser } from "@/auth/decorators/user.decorator";
 import { ChannelFilterDto } from "./dto/channel-filter.dto";
+import { ChannelFilterInput } from "./filters/channel-filter.types";
 
 @Controller("channel")
 export class ChannelController {
   constructor(private readonly channelService: ChannelService) {}
 
-  // @Auth()
-  // @Get()
-  // async getAll(@Query("page") page?: string, @Query("limit") limit?: string) {
-  //   const pageNumber = parseInt(page ?? "1", 10);
-  //   const limitNumber = parseInt(limit ?? "10", 10);
-  //   return this.channelService.getAll(pageNumber, limitNumber);
-  // }
+  @Get("max-values")
+  async getMaxValues() {
+    return this.channelService.getMaxValues();
+  }
 
-  // @Get("approved")
-  // async getApproved(
-  //   @Query("page") page?: string,
-  //   @Query("limit") limit?: string
-  // ) {
-  //   const pageNumber = parseInt(page ?? "1", 10);
-  //   const limitNumber = parseInt(limit ?? "10", 10);
-  //   return this.channelService.getApproved(pageNumber, limitNumber);
-  // }
-
-  @Auth()
   @Get()
-  @UsePipes(new ValidationPipe({ transform: true }))
   async getAll(
-    @Query("page") page?: string,
-    @Query("limit") limit?: string,
-    @Query() filter?: ChannelFilterDto
+    @Query("page") page: string = "1",
+    @Query("limit") limit: string = "10",
+    @Query("minSubscribers") minSubscribers?: string,
+    @Query("maxSubscribers") maxSubscribers?: string
   ) {
-    const pageNumber = parseInt(page ?? "1", 10);
-    const limitNumber = parseInt(limit ?? "10", 10);
-    return this.channelService.getAll(pageNumber, limitNumber, filter);
+    const filter: ChannelFilterInput = {
+      minSubscribers: minSubscribers ? Number(minSubscribers) : undefined,
+      maxSubscribers: maxSubscribers ? Number(maxSubscribers) : undefined,
+    };
+    return this.channelService.getAll(Number(page), Number(limit), filter);
   }
 
   @Get("approved")
-  @UsePipes(new ValidationPipe({ transform: true })) // ✅
   async getApproved(
-    @Query("page") page?: string,
-    @Query("limit") limit?: string,
-    @Query() filter?: ChannelFilterDto
+    @Query("page") page: string = "1",
+    @Query("limit") limit: string = "10",
+    @Query("minSubscribers") minSubscribers?: string,
+    @Query("maxSubscribers") maxSubscribers?: string
   ) {
-    const pageNumber = parseInt(page ?? "1", 10);
-    const limitNumber = parseInt(limit ?? "10", 10);
-    return this.channelService.getApproved(pageNumber, limitNumber, filter);
+    const filter: ChannelFilterInput = {
+      minSubscribers: minSubscribers ? Number(minSubscribers) : undefined,
+      maxSubscribers: maxSubscribers ? Number(maxSubscribers) : undefined,
+    };
+    return this.channelService.getApproved(Number(page), Number(limit), filter);
   }
 
   @Get("actual")
