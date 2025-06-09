@@ -43,7 +43,8 @@ export class ChannelController {
     @Query("minCpv") minCpv?: string,
     @Query("maxCpv") maxCpv?: string,
     @Query("sortBy") sortBy?: SortField,
-    @Query("sortOrder") sortOrder?: SortOrder
+    @Query("sortOrder") sortOrder?: SortOrder,
+    @Query("searchQuery") searchQuery?: string
   ) {
     const filter: ChannelQueryInput = {
       page: Number(page),
@@ -57,6 +58,7 @@ export class ChannelController {
         maxEr: maxEr ? Number(maxEr) : undefined,
         minCpv: minCpv ? Number(minCpv) : undefined,
         maxCpv: maxCpv ? Number(maxCpv) : undefined,
+        searchQuery,
       },
       sortBy,
       sortOrder,
@@ -77,7 +79,8 @@ export class ChannelController {
     @Query("minCpv") minCpv?: string,
     @Query("maxCpv") maxCpv?: string,
     @Query("sortBy") sortBy?: SortField,
-    @Query("sortOrder") sortOrder?: SortOrder
+    @Query("sortOrder") sortOrder?: SortOrder,
+    @Query("searchQuery") searchQuery?: string
   ) {
     const filter: ChannelQueryInput = {
       page: Number(page),
@@ -91,6 +94,7 @@ export class ChannelController {
         maxEr: maxEr ? Number(maxEr) : undefined,
         minCpv: minCpv ? Number(minCpv) : undefined,
         maxCpv: maxCpv ? Number(maxCpv) : undefined,
+        searchQuery,
       },
       sortBy,
       sortOrder,

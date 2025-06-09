@@ -1,5 +1,5 @@
 import { Transform, Type } from "class-transformer";
-import { IsBoolean, IsNumber, IsOptional } from "class-validator";
+import { IsBoolean, IsNumber, IsOptional, IsString } from "class-validator";
 
 export class ChannelFilterDto {
   @IsOptional()
@@ -50,4 +50,8 @@ export class ChannelFilterDto {
   @Transform(({ value }) => value === "true")
   @IsBoolean()
   isVerified?: boolean;
+
+  @IsOptional()
+  @IsString()
+  searchQuery?: string;
 }

@@ -7,6 +7,7 @@ export interface ChannelFilterInput {
   maxEr?: number;
   minCpv?: number;
   maxCpv?: number;
+  searchQuery?: string;
 }
 
 export type SortField = "subscribers" | "view" | "er" | "cpv";
