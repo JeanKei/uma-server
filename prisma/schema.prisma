@@ -83,7 +83,6 @@ model StatPublicConfig {
 model StatInitial {
   id          String   @id @default(cuid())
   channelId   String   @unique @map("channel_id")
-  title       String?
   subscribers Int?
   gender      Int?
   view        Int?

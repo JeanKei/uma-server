@@ -4,7 +4,6 @@ import * as path from "path";
 
 const prisma = new PrismaClient();
 
-// Утилита для корректного приведения к числу
 function toNumberOrUndefined(value: any): number | undefined {
   return value === null || value === undefined || value === ""
     ? undefined
@@ -24,13 +23,10 @@ async function main() {
   const data = JSON.parse(await fs.readFile(jsonPath, "utf-8"));
 
   let total = 0;
-
   let createdChannels = 0;
   let updatedChannels = 0;
-
   let createdStats = 0;
   let updatedStats = 0;
-
   let categoryLinksCreated = 0;
 
   for (const item of data) {
@@ -66,6 +62,7 @@ async function main() {
     if (existingChannel) {
       const needsUpdate =
         existingChannel.price !== toNumberOrUndefined(price) ||
+        existingChannel.title !== title ||
         existingChannel.status !== ChannelStatus.APPROVED ||
         existingChannel.isActual !== false;
 
@@ -74,6 +71,7 @@ async function main() {
           where: { url: link },
           data: {
             price: toNumberOrUndefined(price),
+            title,
             status: ChannelStatus.APPROVED,
             isActual: false,
           },
@@ -87,6 +85,7 @@ async function main() {
         data: {
           url: link,
           price: toNumberOrUndefined(price),
+          title,
           status: ChannelStatus.APPROVED,
           isActual: false,
         },
@@ -101,7 +100,6 @@ async function main() {
 
     if (existingStat) {
       const needsUpdate =
-        existingStat.title !== title ||
         existingStat.subscribers !== toNumberOrUndefined(subscribers) ||
         existingStat.gender !== toNumberOrUndefined(gender) ||
         existingStat.view !== toNumberOrUndefined(view) ||
@@ -114,7 +112,6 @@ async function main() {
         await prisma.statInitial.update({
           where: { channelId: channel.id },
           data: {
-            title,
             subscribers: toNumberOrUndefined(subscribers),
             gender: toNumberOrUndefined(gender),
             view: toNumberOrUndefined(view),
@@ -130,7 +127,6 @@ async function main() {
       await prisma.statInitial.create({
         data: {
           channelId: channel.id,
-          title,
           subscribers: toNumberOrUndefined(subscribers),
           gender: toNumberOrUndefined(gender),
           view: toNumberOrUndefined(view),
