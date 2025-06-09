@@ -15,7 +15,11 @@ import { ChannelService } from "./channel.service";
 import { ChannelDto } from "./dto/channel.dto";
 import { Auth } from "src/auth/decorators/auth.decorator";
 import { CurrentUser } from "@/auth/decorators/user.decorator";
-import { ChannelFilterInput } from "./filters/channel-filter.types";
+import {
+  ChannelQueryInput,
+  SortField,
+  SortOrder,
+} from "./filters/channel-filter.types";
 
 @Controller("channel")
 export class ChannelController {
@@ -37,19 +41,27 @@ export class ChannelController {
     @Query("minEr") minEr?: string,
     @Query("maxEr") maxEr?: string,
     @Query("minCpv") minCpv?: string,
-    @Query("maxCpv") maxCpv?: string
+    @Query("maxCpv") maxCpv?: string,
+    @Query("sortBy") sortBy?: SortField,
+    @Query("sortOrder") sortOrder?: SortOrder
   ) {
-    const filter: ChannelFilterInput = {
-      minSubscribers: minSubscribers ? Number(minSubscribers) : undefined,
-      maxSubscribers: maxSubscribers ? Number(maxSubscribers) : undefined,
-      minView: minView ? Number(minView) : undefined,
-      maxView: maxView ? Number(maxView) : undefined,
-      minEr: minEr ? Number(minEr) : undefined,
-      maxEr: maxEr ? Number(maxEr) : undefined,
-      minCpv: minCpv ? Number(minCpv) : undefined,
-      maxCpv: maxCpv ? Number(maxCpv) : undefined,
+    const filter: ChannelQueryInput = {
+      page: Number(page),
+      limit: Number(limit),
+      filter: {
+        minSubscribers: minSubscribers ? Number(minSubscribers) : undefined,
+        maxSubscribers: maxSubscribers ? Number(maxSubscribers) : undefined,
+        minView: minView ? Number(minView) : undefined,
+        maxView: maxView ? Number(maxView) : undefined,
+        minEr: minEr ? Number(minEr) : undefined,
+        maxEr: maxEr ? Number(maxEr) : undefined,
+        minCpv: minCpv ? Number(minCpv) : undefined,
+        maxCpv: maxCpv ? Number(maxCpv) : undefined,
+      },
+      sortBy,
+      sortOrder,
     };
-    return this.channelService.getAll(Number(page), Number(limit), filter);
+    return this.channelService.getAll(filter);
   }
 
   @Get("approved")
@@ -63,21 +75,30 @@ export class ChannelController {
     @Query("minEr") minEr?: string,
     @Query("maxEr") maxEr?: string,
     @Query("minCpv") minCpv?: string,
-    @Query("maxCpv") maxCpv?: string
+    @Query("maxCpv") maxCpv?: string,
+    @Query("sortBy") sortBy?: SortField,
+    @Query("sortOrder") sortOrder?: SortOrder
   ) {
-    const filter: ChannelFilterInput = {
-      minSubscribers: minSubscribers ? Number(minSubscribers) : undefined,
-      maxSubscribers: maxSubscribers ? Number(maxSubscribers) : undefined,
-      minView: minView ? Number(minView) : undefined,
-      maxView: maxView ? Number(maxView) : undefined,
-      minEr: minEr ? Number(minEr) : undefined,
-      maxEr: maxEr ? Number(maxEr) : undefined,
-      minCpv: minCpv ? Number(minCpv) : undefined,
-      maxCpv: maxCpv ? Number(maxCpv) : undefined,
+    const filter: ChannelQueryInput = {
+      page: Number(page),
+      limit: Number(limit),
+      filter: {
+        minSubscribers: minSubscribers ? Number(minSubscribers) : undefined,
+        maxSubscribers: maxSubscribers ? Number(maxSubscribers) : undefined,
+        minView: minView ? Number(minView) : undefined,
+        maxView: maxView ? Number(maxView) : undefined,
+        minEr: minEr ? Number(minEr) : undefined,
+        maxEr: maxEr ? Number(maxEr) : undefined,
+        minCpv: minCpv ? Number(minCpv) : undefined,
+        maxCpv: maxCpv ? Number(maxCpv) : undefined,
+      },
+      sortBy,
+      sortOrder,
     };
-    return this.channelService.getApproved(Number(page), Number(limit), filter);
+    return this.channelService.getApproved(filter);
   }
 
+  // Остальные методы без изменений
   @Get("actual")
   async getIsActual() {
     return this.channelService.getIsActual();

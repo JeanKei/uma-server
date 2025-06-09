@@ -6,7 +6,7 @@ import { TELEGRAM_MODERATORS } from "@/telegram/telegram.constants";
 import { Markup } from "telegraf";
 import { buildChannelFilter } from "./filters/channel-filter";
 import { ChannelStatus } from "@prisma/client";
-import { ChannelFilterInput } from "./filters/channel-filter.types";
+import { ChannelQueryInput } from "./filters/channel-filter.types";
 
 @Injectable()
 export class ChannelService {
@@ -33,19 +33,30 @@ export class ChannelService {
     };
   }
 
-  async getAll(page = 1, limit = 10, filter: ChannelFilterInput = {}) {
+  async getAll(query: ChannelQueryInput) {
+    const page = query.page || 1;
+    const limit = query.limit || 10;
     const skip = (page - 1) * limit;
+    const filter = query.filter || {};
+    const sortBy = query.sortBy || "createdAt";
+    const sortOrder = query.sortOrder || "desc";
+
     const where = await buildChannelFilter(filter, this);
 
-    console.log("Received filter:", filter);
+    console.log("Received query:", query);
     console.log("Prisma query where:", JSON.stringify(where, null, 2));
+
+    const orderBy =
+      sortBy === "createdAt"
+        ? { createdAt: sortOrder }
+        : { statInitial: { [sortBy]: sortOrder } };
 
     const [items, total] = await Promise.all([
       this.prisma.channel.findMany({
         where,
         skip,
         take: limit,
-        orderBy: { createdAt: "desc" },
+        orderBy,
         include: {
           statPublic: true,
           categoriesChannel: true,
@@ -61,8 +72,13 @@ export class ChannelService {
     return { items, total, page, limit, hasMore };
   }
 
-  async getApproved(page = 1, limit = 10, filter: ChannelFilterInput = {}) {
+  async getApproved(query: ChannelQueryInput) {
+    const page = query.page || 1;
+    const limit = query.limit || 10;
     const skip = (page - 1) * limit;
+    const filter = query.filter || {};
+    const sortBy = query.sortBy || "createdAt";
+    const sortOrder = query.sortOrder || "desc";
 
     const filterWhere = await buildChannelFilter(filter, this);
 
@@ -71,15 +87,20 @@ export class ChannelService {
       status: ChannelStatus.APPROVED,
     };
 
-    console.log("Received filter:", filter);
+    console.log("Received query:", query);
     console.log("Prisma query where:", JSON.stringify(where, null, 2));
+
+    const orderBy =
+      sortBy === "createdAt"
+        ? { createdAt: sortOrder }
+        : { statInitial: { [sortBy]: sortOrder } };
 
     const [items, total] = await Promise.all([
       this.prisma.channel.findMany({
         where,
         skip,
         take: limit,
-        orderBy: { createdAt: "desc" },
+        orderBy,
         include: {
           statPublic: true,
           categoriesChannel: true,

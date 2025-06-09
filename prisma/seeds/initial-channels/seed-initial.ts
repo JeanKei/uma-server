@@ -4,6 +4,19 @@ import * as path from "path";
 
 const prisma = new PrismaClient();
 
+// Утилита для корректного приведения к числу
+function toNumberOrUndefined(value: any): number | undefined {
+  return value === null || value === undefined || value === ""
+    ? undefined
+    : Number(value);
+}
+
+function toFloatOrUndefined(value: any): number | undefined {
+  return value === null || value === undefined || value === ""
+    ? undefined
+    : parseFloat(value);
+}
+
 async function main() {
   const jsonPath = path.resolve(
     "prisma/seeds/initial-channels/initial_channels.json"
@@ -52,7 +65,7 @@ async function main() {
 
     if (existingChannel) {
       const needsUpdate =
-        existingChannel.price !== Number(price) ||
+        existingChannel.price !== toNumberOrUndefined(price) ||
         existingChannel.status !== ChannelStatus.APPROVED ||
         existingChannel.isActual !== false;
 
@@ -60,7 +73,7 @@ async function main() {
         channel = await prisma.channel.update({
           where: { url: link },
           data: {
-            price: Number(price) || undefined,
+            price: toNumberOrUndefined(price),
             status: ChannelStatus.APPROVED,
             isActual: false,
           },
@@ -73,7 +86,7 @@ async function main() {
       channel = await prisma.channel.create({
         data: {
           url: link,
-          price: Number(price) || undefined,
+          price: toNumberOrUndefined(price),
           status: ChannelStatus.APPROVED,
           isActual: false,
         },
@@ -89,12 +102,12 @@ async function main() {
     if (existingStat) {
       const needsUpdate =
         existingStat.title !== title ||
-        existingStat.subscribers !== Number(subscribers) ||
-        existingStat.gender !== Number(gender) ||
-        existingStat.view !== Number(view) ||
-        existingStat.er !== parseFloat(ER) ||
-        existingStat.cpv !== parseFloat(CPV) ||
-        existingStat.price !== Number(price) ||
+        existingStat.subscribers !== toNumberOrUndefined(subscribers) ||
+        existingStat.gender !== toNumberOrUndefined(gender) ||
+        existingStat.view !== toNumberOrUndefined(view) ||
+        existingStat.er !== toFloatOrUndefined(ER) ||
+        existingStat.cpv !== toFloatOrUndefined(CPV) ||
+        existingStat.price !== toNumberOrUndefined(price) ||
         existingStat.imgSrc !== imgSrc;
 
       if (needsUpdate) {
@@ -102,12 +115,12 @@ async function main() {
           where: { channelId: channel.id },
           data: {
             title,
-            subscribers: Number(subscribers) || undefined,
-            gender: Number(gender) || undefined,
-            view: Number(view) || undefined,
-            er: parseFloat(ER) || undefined,
-            cpv: parseFloat(CPV) || undefined,
-            price: Number(price) || undefined,
+            subscribers: toNumberOrUndefined(subscribers),
+            gender: toNumberOrUndefined(gender),
+            view: toNumberOrUndefined(view),
+            er: toFloatOrUndefined(ER),
+            cpv: toFloatOrUndefined(CPV),
+            price: toNumberOrUndefined(price),
             imgSrc,
           },
         });
@@ -118,12 +131,12 @@ async function main() {
         data: {
           channelId: channel.id,
           title,
-          subscribers: Number(subscribers) || undefined,
-          gender,
-          view: Number(view) || undefined,
-          er: parseFloat(ER) || undefined,
-          cpv: parseFloat(CPV) || undefined,
-          price: Number(price) || undefined,
+          subscribers: toNumberOrUndefined(subscribers),
+          gender: toNumberOrUndefined(gender),
+          view: toNumberOrUndefined(view),
+          er: toFloatOrUndefined(ER),
+          cpv: toFloatOrUndefined(CPV),
+          price: toNumberOrUndefined(price),
           imgSrc,
         },
       });

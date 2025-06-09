@@ -8,3 +8,14 @@ export interface ChannelFilterInput {
   minCpv?: number;
   maxCpv?: number;
 }
+
+export type SortField = "subscribers" | "view" | "er" | "cpv";
+export type SortOrder = "asc" | "desc";
+
+export interface ChannelQueryInput {
+  page?: number;
+  limit?: number;
+  filter?: ChannelFilterInput;
+  sortBy?: SortField;
+  sortOrder?: SortOrder;
+}
