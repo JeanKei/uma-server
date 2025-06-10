@@ -37,11 +37,27 @@ model Channel {
   createdAt         DateTime            @default(now()) @map("created_at")
   updatedAt         DateTime            @updatedAt @map("updated_at")
   categoriesChannel CategoriesChannel[]
+  channelReviews    ChannelReviews[]
   user              User?               @relation(fields: [userId], references: [id])
   statInitial       StatInitial?
   statPublic        StatPublic?
 
   @@map("channels")
+
+}
+
+model ChannelReviews {
+  id          String   @id @default(cuid())
+  name        String
+  description String
+  review      String
+  rating      Float
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  channelId   String   @map("channel_id")
+  channel     Channel  @relation(fields: [channelId], references: [id])
+
+  @@map("channel_reviews")
 }
 
 model StatPublic {

@@ -8,6 +8,7 @@ import { ArticleModule } from "./article/article.module";
 import { StatPublicModule } from "./stats/stat-public/stat-public.module";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
+import { ChannelReviewsModule } from "./reviews/channel-reviews.module";
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { join } from "path";
     TelegramModule,
     ArticleModule,
     StatPublicModule,
+    ChannelReviewsModule,
   ],
 })
 export class AppModule {}
