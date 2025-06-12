@@ -5,7 +5,7 @@ export async function buildCpvWhere(
   maxCpv: number | undefined,
   maxCpvDefault: number
 ): Promise<Prisma.ChannelWhereInput> {
-  const cpvFilter: Prisma.StatInitialWhereInput["cpv"] = {};
+  const cpvFilter: Prisma.StatsWhereInput["cpv"] = {};
 
   if (minCpv !== undefined && minCpv > 0) {
     cpvFilter.gte = minCpv;
@@ -15,7 +15,7 @@ export async function buildCpvWhere(
   }
 
   let where: Prisma.ChannelWhereInput = {
-    statInitial: {
+    stats: {
       ...(Object.keys(cpvFilter).length > 0 && {
         cpv: cpvFilter,
       }),
@@ -27,12 +27,12 @@ export async function buildCpvWhere(
       ...where,
       OR: [
         {
-          statInitial: {
+          stats: {
             cpv: { lte: maxCpvDefault },
           },
         },
         {
-          statInitial: {
+          stats: {
             cpv: null,
           },
         },

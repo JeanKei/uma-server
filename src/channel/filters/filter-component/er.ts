@@ -5,7 +5,7 @@ export async function buildErWhere(
   maxEr: number | undefined,
   maxErDefault: number
 ): Promise<Prisma.ChannelWhereInput> {
-  const erFilter: Prisma.StatInitialWhereInput["er"] = {};
+  const erFilter: Prisma.StatsWhereInput["er"] = {};
 
   if (minEr !== undefined && minEr > 0) {
     erFilter.gte = minEr;
@@ -15,7 +15,7 @@ export async function buildErWhere(
   }
 
   let where: Prisma.ChannelWhereInput = {
-    statInitial: {
+    stats: {
       ...(Object.keys(erFilter).length > 0 && {
         er: erFilter,
       }),
@@ -27,12 +27,12 @@ export async function buildErWhere(
       ...where,
       OR: [
         {
-          statInitial: {
+          stats: {
             er: { lte: maxErDefault },
           },
         },
         {
-          statInitial: {
+          stats: {
             er: null,
           },
         },

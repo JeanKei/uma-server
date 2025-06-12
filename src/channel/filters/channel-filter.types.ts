@@ -8,6 +8,7 @@ export interface ChannelFilterInput {
   minCpv?: number;
   maxCpv?: number;
   searchQuery?: string;
+  categories?: string[];
 }
 
 export type SortField = "subscribers" | "view" | "er" | "cpv";

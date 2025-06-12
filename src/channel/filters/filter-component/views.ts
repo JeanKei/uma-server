@@ -5,7 +5,7 @@ export async function buildViewsWhere(
   maxView: number | undefined,
   maxViewsDefault: number
 ): Promise<Prisma.ChannelWhereInput> {
-  const viewsFilter: Prisma.StatInitialWhereInput["view"] = {};
+  const viewsFilter: Prisma.StatsWhereInput["view"] = {};
 
   if (minView !== undefined && minView > 0) {
     viewsFilter.gte = minView;
@@ -15,7 +15,7 @@ export async function buildViewsWhere(
   }
 
   let where: Prisma.ChannelWhereInput = {
-    statInitial: {
+    stats: {
       ...(Object.keys(viewsFilter).length > 0 && {
         view: viewsFilter,
       }),
@@ -27,12 +27,12 @@ export async function buildViewsWhere(
       ...where,
       OR: [
         {
-          statInitial: {
+          stats: {
             view: { lte: maxViewsDefault },
           },
         },
         {
-          statInitial: {
+          stats: {
             view: null,
           },
         },

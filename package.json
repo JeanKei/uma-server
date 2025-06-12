@@ -20,9 +20,9 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "email": "emails dev",
     "ngrok": "ngrok http 4200",
-    "seed:initial": "ts-node prisma/seeds/initial-channels/seed-initial.ts",
-    "seed:descriptions": "ts-node prisma/seeds/descriptions-channels/seed-descriptions.ts",
-    "seed:reviews": "ts-node prisma/seeds/reviews-channels/seed-reviews.ts"
+    "seed:stats": "ts-node prisma/seeds-channels/stats/stats.ts",
+    "seed:descriptions": "ts-node prisma/seeds-channels/descriptions/descriptions.ts",
+    "seed:reviews": "ts-node prisma/seeds-channels/reviews/reviews.ts"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^2.0.2",

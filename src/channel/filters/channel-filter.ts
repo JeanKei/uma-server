@@ -20,6 +20,7 @@ export async function buildChannelFilter(
     minCpv,
     maxCpv,
     searchQuery,
+    categories,
   } = params;
 
   const maxValues = await channelService.getMaxValues();
@@ -45,8 +46,25 @@ export async function buildChannelFilter(
       }
     : {};
 
+  const categoriesWhere: Prisma.ChannelWhereInput = categories?.length
+    ? {
+        categoriesChannel: {
+          some: {
+            categoryId: { in: categories },
+          },
+        },
+      }
+    : {};
+
   const where: Prisma.ChannelWhereInput = {
-    AND: [subscribersWhere, viewsWhere, erWhere, cpvWhere, searchWhere],
+    AND: [
+      subscribersWhere,
+      viewsWhere,
+      erWhere,
+      cpvWhere,
+      searchWhere,
+      categoriesWhere,
+    ],
   };
 
   return where;

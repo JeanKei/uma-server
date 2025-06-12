@@ -39,11 +39,10 @@ model Channel {
   categoriesChannel CategoriesChannel[]
   channelReviews    ChannelReviews[]
   user              User?               @relation(fields: [userId], references: [id])
-  statInitial       StatInitial?
+  stats             Stats?
   statPublic        StatPublic?
 
   @@map("channels")
-
 }
 
 model ChannelReviews {
@@ -76,7 +75,7 @@ model StatPublic {
   updatedAt   DateTime @updatedAt @map("updated_at")
   channel     Channel  @relation(fields: [channelId], references: [id])
 
-  @@map("stat_public")
+  @@map("stats_public")
 }
 
 model StatPublicJob {
@@ -85,7 +84,7 @@ model StatPublicJob {
   finishedAt  DateTime? @map("finished_at")
   parsedCount Int       @default(0) @map("parsed_count")
 
-  @@map("stat_public_job")
+  @@map("stats_public_job")
 }
 
 model StatPublicConfig {
@@ -93,24 +92,23 @@ model StatPublicConfig {
   intervalSeconds Int      @default(60) @map("interval_seconds")
   updatedAt       DateTime @updatedAt @map("updated_at")
 
-  @@map("stat_public_config")
+  @@map("stats_public_config")
 }
 
-model StatInitial {
+model Stats {
   id          String   @id @default(cuid())
   channelId   String   @unique @map("channel_id")
-  subscribers Int?
-  gender      Int?
-  view        Int?
-  er          Float?
-  cpv         Float?
-  price       Int?
-  imgSrc      String?  @map("img_src")
+  subscribers Int?     @default(0)
+  gender      Int?     @default(0)
+  view        Int?     @default(0)
+  er          Float?   @default(0)
+  cpv         Float?   @default(0)
+  price       Int?     @default(0)
+  imgSrc      String?  @map("img_src") @default("default-img/default.png")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   channel     Channel  @relation(fields: [channelId], references: [id])
-
-  @@map("stat_initial")
+  @@map("stats")
 }
 
 model Category {

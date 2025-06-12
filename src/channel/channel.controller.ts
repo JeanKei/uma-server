@@ -25,6 +25,11 @@ import {
 export class ChannelController {
   constructor(private readonly channelService: ChannelService) {}
 
+  @Get("categories")
+  async getCategories() {
+    return this.channelService.getCategories();
+  }
+
   @Get("max-values")
   async getMaxValues() {
     return this.channelService.getMaxValues();
@@ -44,7 +49,8 @@ export class ChannelController {
     @Query("maxCpv") maxCpv?: string,
     @Query("sortBy") sortBy?: SortField,
     @Query("sortOrder") sortOrder?: SortOrder,
-    @Query("searchQuery") searchQuery?: string
+    @Query("searchQuery") searchQuery?: string,
+    @Query("categories") categories?: string
   ) {
     const filter: ChannelQueryInput = {
       page: Number(page),
@@ -59,6 +65,7 @@ export class ChannelController {
         minCpv: minCpv ? Number(minCpv) : undefined,
         maxCpv: maxCpv ? Number(maxCpv) : undefined,
         searchQuery,
+        categories: categories ? categories.split(",") : undefined,
       },
       sortBy,
       sortOrder,
@@ -80,7 +87,8 @@ export class ChannelController {
     @Query("maxCpv") maxCpv?: string,
     @Query("sortBy") sortBy?: SortField,
     @Query("sortOrder") sortOrder?: SortOrder,
-    @Query("searchQuery") searchQuery?: string
+    @Query("searchQuery") searchQuery?: string,
+    @Query("categories") categories?: string
   ) {
     const filter: ChannelQueryInput = {
       page: Number(page),
@@ -95,6 +103,7 @@ export class ChannelController {
         minCpv: minCpv ? Number(minCpv) : undefined,
         maxCpv: maxCpv ? Number(maxCpv) : undefined,
         searchQuery,
+        categories: categories ? categories.split(",") : undefined,
       },
       sortBy,
       sortOrder,
@@ -102,7 +111,6 @@ export class ChannelController {
     return this.channelService.getApproved(filter);
   }
 
-  // Остальные методы без изменений
   @Get("actual")
   async getIsActual() {
     return this.channelService.getIsActual();

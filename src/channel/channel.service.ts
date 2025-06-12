@@ -15,8 +15,18 @@ export class ChannelService {
     private readonly telegram: TelegramService
   ) {}
 
+  async getCategories() {
+    return this.prisma.category.findMany({
+      select: {
+        id: true,
+        name: true,
+      },
+      orderBy: { name: "asc" },
+    });
+  }
+
   async getMaxValues() {
-    const statInitialMax = await this.prisma.statInitial.aggregate({
+    const statInitialMax = await this.prisma.stats.aggregate({
       _max: {
         subscribers: true,
         view: true,
@@ -49,7 +59,7 @@ export class ChannelService {
     const orderBy =
       sortBy === "createdAt"
         ? { createdAt: sortOrder }
-        : { statInitial: { [sortBy]: sortOrder } };
+        : { stats: { [sortBy]: sortOrder } };
 
     const [items, total] = await Promise.all([
       this.prisma.channel.findMany({
@@ -59,8 +69,10 @@ export class ChannelService {
         orderBy,
         include: {
           statPublic: true,
-          categoriesChannel: true,
-          statInitial: true,
+          categoriesChannel: {
+            include: { category: true },
+          },
+          stats: true,
         },
       }),
       this.prisma.channel.count({ where }),
@@ -93,7 +105,7 @@ export class ChannelService {
     const orderBy =
       sortBy === "createdAt"
         ? { createdAt: sortOrder }
-        : { statInitial: { [sortBy]: sortOrder } };
+        : { stats: { [sortBy]: sortOrder } };
 
     const [items, total] = await Promise.all([
       this.prisma.channel.findMany({
@@ -103,8 +115,10 @@ export class ChannelService {
         orderBy,
         include: {
           statPublic: true,
-          categoriesChannel: true,
-          statInitial: true,
+          categoriesChannel: {
+            include: { category: true },
+          },
+          stats: true,
         },
       }),
       this.prisma.channel.count({ where }),
@@ -123,7 +137,7 @@ export class ChannelService {
       include: {
         statPublic: true,
         categoriesChannel: true,
-        statInitial: true,
+        stats: true,
       },
     });
   }
@@ -134,7 +148,7 @@ export class ChannelService {
       include: {
         statPublic: true,
         categoriesChannel: true,
-        statInitial: true,
+        stats: true,
       },
     });
 
@@ -149,7 +163,7 @@ export class ChannelService {
       include: {
         statPublic: true,
         categoriesChannel: true,
-        statInitial: true,
+        stats: true,
       },
     });
   }
@@ -160,7 +174,7 @@ export class ChannelService {
       include: {
         statPublic: true,
         categoriesChannel: true,
-        statInitial: true,
+        stats: true,
       },
     });
 
@@ -174,6 +188,14 @@ export class ChannelService {
         ...dto,
         userId,
         status: "MODERATION",
+        stats: {
+          create: {},
+        },
+      },
+      include: {
+        statPublic: true,
+        categoriesChannel: true,
+        stats: true,
       },
     });
 
@@ -234,7 +256,7 @@ export class ChannelService {
       include: {
         statPublic: true,
         categoriesChannel: true,
-        statInitial: true,
+        stats: true,
       },
     });
   }

@@ -5,7 +5,7 @@ export async function buildSubscribersWhere(
   maxSubscribers: number | undefined,
   maxSubscribersDefault: number
 ): Promise<Prisma.ChannelWhereInput> {
-  const subscribersFilter: Prisma.StatInitialWhereInput["subscribers"] = {};
+  const subscribersFilter: Prisma.StatsWhereInput["subscribers"] = {};
 
   if (minSubscribers !== undefined && minSubscribers > 0) {
     subscribersFilter.gte = minSubscribers;
@@ -15,7 +15,7 @@ export async function buildSubscribersWhere(
   }
 
   let where: Prisma.ChannelWhereInput = {
-    statInitial: {
+    stats: {
       ...(Object.keys(subscribersFilter).length > 0 && {
         subscribers: subscribersFilter,
       }),
@@ -27,12 +27,12 @@ export async function buildSubscribersWhere(
       ...where,
       OR: [
         {
-          statInitial: {
+          stats: {
             subscribers: { lte: maxSubscribersDefault },
           },
         },
         {
-          statInitial: {
+          stats: {
             subscribers: null,
           },
         },
