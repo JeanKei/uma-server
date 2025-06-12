@@ -8,5 +8,6 @@ import { TelegramModule } from "@/telegram/telegram.module";
   imports: [TelegramModule],
   controllers: [ChannelController],
   providers: [ChannelService, PrismaService],
+  exports: [ChannelService],
 })
 export class ChannelModule {}

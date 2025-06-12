@@ -9,9 +9,12 @@ import { StatPublicModule } from "./stats/stat-public/stat-public.module";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
 import { ChannelReviewsModule } from "./reviews/channel-reviews.module";
+import { SitemapModule } from "./sitemap/sitemap.module";
+import { ScheduleModule } from "@nestjs/schedule";
 
 @Module({
   imports: [
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -26,6 +29,7 @@ import { ChannelReviewsModule } from "./reviews/channel-reviews.module";
     ArticleModule,
     StatPublicModule,
     ChannelReviewsModule,
+    SitemapModule,
   ],
 })
 export class AppModule {}

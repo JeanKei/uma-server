@@ -21,7 +21,8 @@
     "email": "emails dev",
     "ngrok": "ngrok http 4200",
     "seed:initial": "ts-node prisma/seeds/initial-channels/seed-initial.ts",
-    "seed:descriptions": "ts-node prisma/seeds/descriptions-channels/seed-descriptions.ts"
+    "seed:descriptions": "ts-node prisma/seeds/descriptions-channels/seed-descriptions.ts",
+    "seed:reviews": "ts-node prisma/seeds/reviews-channels/seed-reviews.ts"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^2.0.2",
@@ -32,6 +33,7 @@
     "@nestjs/mapped-types": "^2.1.0",
     "@nestjs/passport": "^11.0.5",
     "@nestjs/platform-express": "^11.0.11",
+    "@nestjs/schedule": "^6.0.0",
     "@nestjs/serve-static": "^5.0.3",
     "@nestlab/google-recaptcha": "^3.9.0",
     "@prisma/client": "6.4.1",
@@ -59,6 +61,7 @@
     "react-email": "3.0.7",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.2",
+    "sitemap": "^8.0.0",
     "telegraf": "^4.16.3",
     "twilio": "^5.4.5",
     "typegram": "^5.2.0"
