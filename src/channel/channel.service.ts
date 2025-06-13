@@ -35,9 +35,16 @@ export class ChannelService {
       },
     });
 
+    const statChannelMax = await this.prisma.channel.aggregate({
+      _max: {
+        price: true,
+      },
+    });
+
     return {
       maxSubscribers: statInitialMax._max.subscribers || 0,
       maxView: statInitialMax._max.view || 0,
+      maxPrice: statChannelMax._max.price || 0,
       maxEr: statInitialMax._max.er || 0,
       maxCpv: statInitialMax._max.cpv || 0,
     };

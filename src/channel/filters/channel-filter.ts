@@ -3,6 +3,7 @@ import { ChannelFilterInput } from "./channel-filter.types";
 import { ChannelService } from "../channel.service";
 import { buildSubscribersWhere } from "./filter-component/subscribers";
 import { buildViewsWhere } from "./filter-component/views";
+import { buildPricesWhere } from "./filter-component/price";
 import { buildErWhere } from "./filter-component/er";
 import { buildCpvWhere } from "./filter-component/cpv";
 
@@ -15,6 +16,8 @@ export async function buildChannelFilter(
     maxSubscribers,
     minView,
     maxView,
+    minPrice,
+    maxPrice,
     minEr,
     maxEr,
     minCpv,
@@ -33,6 +36,12 @@ export async function buildChannelFilter(
   const erWhere = await buildErWhere(minEr, maxEr, maxValues.maxEr);
 
   const viewsWhere = await buildViewsWhere(minView, maxView, maxValues.maxView);
+
+  const priceWhere = await buildPricesWhere(
+    minPrice,
+    maxPrice,
+    maxValues.maxPrice
+  );
 
   const cpvWhere = await buildCpvWhere(minCpv, maxCpv, maxValues.maxCpv);
 
@@ -60,6 +69,7 @@ export async function buildChannelFilter(
     AND: [
       subscribersWhere,
       viewsWhere,
+      priceWhere,
       erWhere,
       cpvWhere,
       searchWhere,

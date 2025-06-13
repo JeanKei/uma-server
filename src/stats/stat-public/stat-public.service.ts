@@ -84,10 +84,7 @@ export class StatPublicService {
 
   private async scrapeChannelInfo(channelUrl: string) {
     try {
-      const username = channelUrl
-        .replace("https://t.me/", "")
-        .replace(/^@/, "")
-        .trim();
+      const username = channelUrl.replace("https://t.me/", "").trim();
       const response = await axios.get(`https://t.me/s/${username}`, {
         headers: { "User-Agent": "Mozilla/5.0" },
         timeout: 10000,

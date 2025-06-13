@@ -3,6 +3,8 @@ export interface ChannelFilterInput {
   maxSubscribers?: number;
   minView?: number;
   maxView?: number;
+  minPrice?: number;
+  maxPrice?: number;
   minEr?: number;
   maxEr?: number;
   minCpv?: number;
@@ -11,7 +13,7 @@ export interface ChannelFilterInput {
   categories?: string[];
 }
 
-export type SortField = "subscribers" | "view" | "er" | "cpv";
+export type SortField = "subscribers" | "view" | "er" | "cpv" | "price";
 export type SortOrder = "asc" | "desc";
 
 export interface ChannelQueryInput {
