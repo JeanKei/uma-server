@@ -37,5 +37,17 @@ lerna-debug.log*
 
 .env
 
+# Игнорируем все файлы внутри папок
+/uploads/channels-img/*
+/uploads/public-img/*
+/uploads/stats-img/*
 
-/uploads
+# Не игнорируем сами папки (чтобы Git видел структуру)
+!/uploads/channels-img/
+!/uploads/public-img/
+!/uploads/stats-img/
+
+# Не игнорируем заглушки
+!/uploads/channels-img/default.png
+!/uploads/public-img/.gitkeep
+!/uploads/stats-img/.gitkeep

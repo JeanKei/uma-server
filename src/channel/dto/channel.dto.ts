@@ -24,6 +24,10 @@ export class ChannelDto {
   description?: string;
 
   @IsOptional()
+  @IsString()
+  avatar?: string;
+
+  @IsOptional()
   @IsBoolean()
   isActual: boolean;
 

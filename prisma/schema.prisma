@@ -24,6 +24,7 @@ model Channel {
   url               String              @unique @map("channel_url")
   title             String?
   description       String?
+  avatar            String?             
   userId            String?             @map("user_id")
   status            ChannelStatus       @default(MODERATION)
   isActual          Boolean             @default(false) @map("is_actual")

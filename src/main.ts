@@ -11,8 +11,8 @@ async function bootstrap() {
   app.enableCors({
     origin: [
       "http://localhost:3000",
-      "https://collect-clusters-luggage-download.trycloudflare.com",
-      "https://uma.yi-wan.ru",
+      "https://qld-wedding-greetings-motorcycles.trycloudflare.com",
+      "https://umamall.ru",
     ],
     credentials: true,
     exposedHeaders: "set-cookie",
