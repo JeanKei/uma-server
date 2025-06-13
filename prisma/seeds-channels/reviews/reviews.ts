@@ -30,11 +30,11 @@ async function main() {
   for (const item of data) {
     const { link, reviews } = item;
 
-    // Нормализация ссылки
-    let normalizedLink = link.replace("https://t.me/", "");
-    if (!normalizedLink.startsWith("+")) {
-      normalizedLink = "@" + normalizedLink;
-    }
+    // Нормализация ссылки: убираем https://t.me/ и @, если есть
+    let normalizedLink = link
+      .replace("https://t.me/", "")
+      .replace("@", "")
+      .trim();
 
     // Проверка существования канала
     const existingChannel = await prisma.channel.findUnique({
