@@ -62,7 +62,7 @@ export class FileService {
       await writeFile(`${uploadedFolder}/${fileName}`, resizedBuffer);
 
       return {
-        url: `/channels-img/${fileName}`, // Remove /uploads prefix
+        url: `/channels-img/${fileName}`,
         name: fileName,
       };
     } catch (error) {
