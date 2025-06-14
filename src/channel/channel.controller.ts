@@ -10,6 +10,8 @@ import {
   Query,
   UsePipes,
   ValidationPipe,
+  UploadedFile,
+  UseInterceptors,
 } from "@nestjs/common";
 import { ChannelService } from "./channel.service";
 import { ChannelDto } from "./dto/channel.dto";
@@ -20,6 +22,7 @@ import {
   SortField,
   SortOrder,
 } from "./filters/channel-filter.types";
+import { FileInterceptor } from "@nestjs/platform-express";
 
 @Controller("channel")
 export class ChannelController {
@@ -144,16 +147,25 @@ export class ChannelController {
   @Auth()
   @Post()
   @HttpCode(200)
-  async create(@Body() dto: ChannelDto, @CurrentUser("id") userId: string) {
-    return await this.channelService.create(dto, userId);
+  async create(
+    @Body() dto: ChannelDto,
+    @CurrentUser("id") userId: string,
+    @UploadedFile() file?: Express.Multer.File
+  ) {
+    return await this.channelService.create(dto, userId, file);
   }
 
   @Auth()
   @UsePipes(new ValidationPipe())
   @HttpCode(200)
   @Patch(":id")
-  async update(@Param("id") id: string, @Body() dto: ChannelDto) {
-    return this.channelService.update(id, dto);
+  @UseInterceptors(FileInterceptor("image"))
+  async update(
+    @Param("id") id: string,
+    @Body() dto: ChannelDto,
+    @UploadedFile() file?: Express.Multer.File
+  ) {
+    return this.channelService.update(id, dto, file);
   }
 
   @Auth()

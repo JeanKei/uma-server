@@ -28,6 +28,9 @@ export class ChannelDto {
   avatar?: string;
 
   @IsOptional()
+  avatarFile?: any;
+
+  @IsOptional()
   @IsBoolean()
   isActual: boolean;
 

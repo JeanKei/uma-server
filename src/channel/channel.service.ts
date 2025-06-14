@@ -7,12 +7,14 @@ import { Markup } from "telegraf";
 import { buildChannelFilter } from "./filters/channel-filter";
 import { ChannelStatus } from "@prisma/client";
 import { ChannelQueryInput } from "./filters/channel-filter.types";
+import { FileService } from "@/file/file.service";
 
 @Injectable()
 export class ChannelService {
   constructor(
     private readonly prisma: PrismaService,
-    private readonly telegram: TelegramService
+    private readonly telegram: TelegramService,
+    private readonly fileService: FileService
   ) {}
 
   async getCategories() {
@@ -189,10 +191,20 @@ export class ChannelService {
     return channel;
   }
 
-  async create(dto: ChannelDto, userId: string) {
+  async create(dto: ChannelDto, userId: string, file?: Express.Multer.File) {
+    let avatarUrl: string | undefined;
+
+    if (file) {
+      const fileResponse = await this.fileService.saveAvatar(file, dto.url);
+      avatarUrl = fileResponse.url;
+    }
+
+    const { avatarFile, ...channelData } = dto;
+
     const createdChannel = await this.prisma.channel.create({
       data: {
-        ...dto,
+        ...channelData,
+        avatar: avatarUrl,
         userId,
         status: "MODERATION",
         stats: {
@@ -252,13 +264,23 @@ export class ChannelService {
     return createdChannel;
   }
 
-  async update(id: string, dto: ChannelDto) {
+  async update(id: string, dto: ChannelDto, file?: Express.Multer.File) {
     await this.getById(id);
+
+    let avatarUrl: string | undefined;
+
+    if (file) {
+      const fileResponse = await this.fileService.saveAvatar(file, dto.url);
+      avatarUrl = fileResponse.url;
+    }
+
+    const { avatarFile, ...channelData } = dto;
 
     return this.prisma.channel.update({
       where: { id },
       data: {
-        ...dto,
+        ...channelData,
+        avatar: avatarUrl ?? channelData.avatar,
       },
       include: {
         statPublic: true,
