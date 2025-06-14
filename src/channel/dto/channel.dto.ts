@@ -1,5 +1,6 @@
 import { ChannelStatus } from "@prisma/client";
 import {
+  IsArray,
   IsBoolean,
   IsEnum,
   IsNotEmpty,
@@ -59,4 +60,9 @@ export class ChannelDto {
   @IsOptional()
   @IsEnum(ChannelStatus)
   status?: ChannelStatus;
+
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  categoryIds?: string[];
 }
