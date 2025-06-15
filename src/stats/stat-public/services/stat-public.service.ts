@@ -97,7 +97,7 @@ export class StatPublicService {
 
     const totalJobs = await this.prisma.statPublicJob.count();
 
-    const totalParsedChannels = await this.prisma.statPublic.aggregate({
+    const totalParsedChannels = await this.prisma.stats.aggregate({
       _count: {
         channelId: true,
       },
