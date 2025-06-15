@@ -7,11 +7,8 @@ export async function downloadAndSaveAvatar(
   channelUrl: string
 ): Promise<string | null> {
   try {
-    const username = channelUrl
-      .replace("https://t.me/", "")
-      .replace(/^@/, "")
-      .trim();
-    const folder = join(process.cwd(), "uploads", "public-img");
+    const username = channelUrl.replace("https://t.me/", "").trim();
+    const folder = join(process.cwd(), "uploads", "channels-img");
     const filename = `${username}.jpg`;
     const fullPath = join(folder, filename);
 

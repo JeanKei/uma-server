@@ -105,7 +105,7 @@ model Stats {
   er          Float?   @default(0)
   cpv         Float?   @default(0)
   price       Int?     @default(0)
-  imgSrc      String?  @map("img_src") @default("default-img/default.png")
+  imgSrc      String?  @map("img_src") @default("channels-img/default.png")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   channel     Channel  @relation(fields: [channelId], references: [id])
