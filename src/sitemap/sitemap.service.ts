@@ -38,8 +38,8 @@ export class SitemapService implements OnApplicationBootstrap {
   private readonly URLS_PER_SITEMAP = 5000;
 
   async onApplicationBootstrap() {
-    console.log("Generating sitemap on startup at", new Date().toISOString());
-    await this.generateSitemap();
+    // console.log("Generating sitemap on startup at", new Date().toISOString());
+    // await this.generateSitemap();
   }
 
   // @Cron("*/10 * * * * *") // Every 10 seconds for debugging message
