@@ -79,7 +79,6 @@ export class ChannelService {
         take: limit,
         orderBy,
         include: {
-          statPublic: true,
           categoriesChannel: {
             include: { category: true },
           },
@@ -125,7 +124,6 @@ export class ChannelService {
         take: limit,
         orderBy,
         include: {
-          statPublic: true,
           categoriesChannel: {
             include: { category: true },
           },
@@ -146,7 +144,6 @@ export class ChannelService {
       where: { isActual: true },
       orderBy: { createdAt: "desc" },
       include: {
-        statPublic: true,
         categoriesChannel: {
           include: { category: true },
         },
@@ -161,7 +158,6 @@ export class ChannelService {
     const channel = await this.prisma.channel.findUnique({
       where: { url },
       include: {
-        statPublic: true,
         categoriesChannel: {
           include: { category: true },
         },
@@ -179,7 +175,6 @@ export class ChannelService {
       where: { userId },
       orderBy: { createdAt: "desc" },
       include: {
-        statPublic: true,
         categoriesChannel: {
           include: { category: true },
         },
@@ -194,7 +189,6 @@ export class ChannelService {
     const channel = await this.prisma.channel.findUnique({
       where: { id },
       include: {
-        statPublic: true,
         categoriesChannel: {
           include: { category: true },
         },
@@ -237,7 +231,6 @@ export class ChannelService {
         },
       },
       include: {
-        statPublic: true,
         categoriesChannel: {
           include: { category: true },
         },
@@ -318,7 +311,6 @@ export class ChannelService {
         },
       },
       include: {
-        statPublic: true,
         categoriesChannel: {
           include: { category: true },
         },

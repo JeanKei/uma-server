@@ -41,7 +41,6 @@ model Channel {
   channelReviews    ChannelReviews[]
   user              User?               @relation(fields: [userId], references: [id])
   stats             Stats?
-  statPublic        StatPublic?
   posts             Post[]
 
   @@map("channels")
@@ -59,25 +58,6 @@ model ChannelReviews {
   channel     Channel  @relation(fields: [channelId], references: [id])
 
   @@map("channel_reviews")
-}
-
-model StatPublic {
-  id          String   @id @default(cuid())
-  channelId   String   @unique @map("channel_id")
-  avatar      String?
-  title       String?
-  description String?
-  isVerified  Boolean  @map("is_verified")
-  subscribers Int?
-  photos      Int?
-  videos      Int?
-  files       Int?
-  links       Int?
-  createdAt   DateTime @default(now()) @map("created_at")
-  updatedAt   DateTime @updatedAt @map("updated_at")
-  channel     Channel  @relation(fields: [channelId], references: [id])
-
-  @@map("stats_public")
 }
 
 model StatPublicJob {
@@ -100,7 +80,6 @@ model StatPublicConfig {
 model Stats {
   id          String   @id @default(cuid())
   channelId   String   @unique @map("channel_id")
-  avatar      String?
   title       String?
   description String?
   isVerified  Boolean  @default(false) @map("is_verified")
