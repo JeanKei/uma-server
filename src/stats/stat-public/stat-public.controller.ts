@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body } from "@nestjs/common";
-import { StatPublicService } from "./stat-public.service";
+import { StatPublicService } from "./services/stat-public.service";
 
 @Controller("stats-public")
 export class StatPublicController {

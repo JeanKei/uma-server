@@ -1,5 +1,5 @@
-import { getCounter } from "@/utils/get-counter";
-import { parseMetricToNumber } from "@/utils/parse-metric-to-number";
+import { getCounter } from "@/stats/stat-public/utils/get-counter";
+import { parseMetricToNumber } from "@/stats/stat-public/utils/parse-metric-to-number";
 import { CheerioAPI } from "cheerio";
 
 export function parseFiles($: CheerioAPI): number | null {

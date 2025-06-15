@@ -42,6 +42,7 @@ model Channel {
   user              User?               @relation(fields: [userId], references: [id])
   stats             Stats?
   statPublic        StatPublic?
+  posts             Post[]
 
   @@map("channels")
 }
@@ -99,7 +100,15 @@ model StatPublicConfig {
 model Stats {
   id          String   @id @default(cuid())
   channelId   String   @unique @map("channel_id")
-  subscribers Int?     @default(0)
+  avatar      String?
+  title       String?
+  description String?
+  isVerified  Boolean  @default(false) @map("is_verified")
+  subscribers Int?
+  photos      Int?
+  videos      Int?
+  files       Int?
+  links       Int?
   gender      Int?     @default(0)
   view        Int?     @default(0)
   er          Float?   @default(0)
@@ -109,7 +118,25 @@ model Stats {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   channel     Channel  @relation(fields: [channelId], references: [id])
+
   @@map("stats")
+}
+
+model Post {
+  id           String   @id @default(cuid())
+  channelId    String   @map("channel_id")
+  dataPost     String   @unique @map("data_post") 
+  messageUrl   String   @map("message_url")
+  messageText  String?  @map("message_text")
+  views        Int?     @default(0)
+  datetime     DateTime?
+  photos       String[] @default([]) 
+  videos       String[] @default([]) 
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+  channel      Channel  @relation(fields: [channelId], references: [id])
+
+  @@map("posts")
 }
 
 model Category {

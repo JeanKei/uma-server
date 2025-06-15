@@ -124,8 +124,9 @@ async function main() {
     } else {
       await prisma.stats.create({
         data: {
-          channelId: channel.id,
+          channel: { connect: { id: channel.id } },
           subscribers: toNumberOrUndefined(subscribers),
+          isVerified: false,
           gender: toNumberOrUndefined(gender),
           view: toNumberOrUndefined(view),
           er: toFloatOrUndefined(ER),

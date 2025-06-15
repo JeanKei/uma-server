@@ -1,5 +1,5 @@
 import { Injectable, OnModuleInit } from "@nestjs/common";
-import { StatPublicService } from "./stat-public.service";
+import { StatPublicService } from "./services/stat-public.service";
 
 @Injectable()
 export class StatPublicCronService implements OnModuleInit {

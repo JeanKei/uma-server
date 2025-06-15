@@ -1,28 +1,21 @@
 import { Injectable, Logger } from "@nestjs/common";
-import axios from "axios";
-import * as cheerio from "cheerio";
-import { PrismaService } from "src/prisma.service";
 
-import {
-  parseAvatar,
-  parseTitle,
-  parseDescription,
-  parseIsVerified,
-  parseSubscribers,
-  parsePhotos,
-  parseVideos,
-  parseFiles,
-  parseLinks,
-} from "./components";
-import { downloadAndSaveAvatar } from "./components/scrapeChannelInfo";
+import { Stage1Service } from "./stage-1.service";
+import { Stage2Service } from "./stage-2.service";
+import { Stage3Service } from "./stage-3.service";
+import { PrismaService } from "@/prisma.service";
 
 @Injectable()
 export class StatPublicService {
-  constructor(private prisma: PrismaService) {}
-
   private readonly logger = new Logger(StatPublicService.name);
-
   private isParsing = false;
+
+  constructor(
+    private prisma: PrismaService,
+    private stage1: Stage1Service,
+    private stage2: Stage2Service,
+    private stage3: Stage3Service
+  ) {}
 
   public getIsParsing(): boolean {
     return this.isParsing;
@@ -35,7 +28,6 @@ export class StatPublicService {
     }
 
     this.isParsing = true;
-
     const job = await this.prisma.statPublicJob.create({
       data: { startedAt: new Date() },
     });
@@ -48,22 +40,13 @@ export class StatPublicService {
       let parsed = 0;
 
       for (const channel of channels) {
-        const info = await this.scrapeChannelInfo(channel.url);
-        if (info) {
-          await this.prisma.statPublic.upsert({
-            where: { channelId: channel.id },
-            update: {
-              ...info,
-              // createdAt не трогаем, updatedAt обновится автоматически
-            },
-            create: {
-              channelId: channel.id,
-              ...info,
-            },
-          });
-
-          parsed++;
-        }
+        // Этап 1
+        await this.stage1.parseStage1(channel.url, channel.id);
+        // Этап 2
+        await this.stage2.parseStage2(channel.url, channel.id);
+        // Этап 3
+        await this.stage3.parseStage3(channel.url, channel.id);
+        parsed++;
       }
 
       await this.prisma.statPublicJob.update({
@@ -82,38 +65,6 @@ export class StatPublicService {
     }
   }
 
-  private async scrapeChannelInfo(channelUrl: string) {
-    try {
-      const username = channelUrl.replace("https://t.me/", "").trim();
-      const response = await axios.get(`https://t.me/s/${username}`, {
-        headers: { "User-Agent": "Mozilla/5.0" },
-        timeout: 10000,
-      });
-
-      const $ = cheerio.load(response.data);
-
-      const avatarUrl = parseAvatar($); // Это Telegram CDN URL
-      const avatarPath = avatarUrl
-        ? await downloadAndSaveAvatar(avatarUrl, channelUrl)
-        : null;
-
-      return {
-        avatar: avatarPath,
-        title: parseTitle($),
-        description: parseDescription($),
-        isVerified: parseIsVerified($),
-        subscribers: parseSubscribers($),
-        photos: parsePhotos($),
-        videos: parseVideos($),
-        files: parseFiles($),
-        links: parseLinks($),
-      };
-    } catch (err) {
-      this.logger.warn(`Ошибка парсинга ${channelUrl}: ${err.message}`);
-      return null;
-    }
-  }
-
   async getIntervalSeconds(): Promise<number> {
     const config = await this.prisma.statPublicConfig.findUnique({
       where: { id: "singleton" },
@@ -125,10 +76,7 @@ export class StatPublicService {
     return this.prisma.statPublicConfig.upsert({
       where: { id: "singleton" },
       update: { intervalSeconds: seconds },
-      create: {
-        id: "singleton",
-        intervalSeconds: seconds,
-      },
+      create: { id: "singleton", intervalSeconds: seconds },
     });
   }
 
@@ -154,6 +102,9 @@ export class StatPublicService {
         channelId: true,
       },
     });
+
+    // Подсчет общего количества постов
+    const totalParsedPosts = await this.prisma.post.count();
 
     const avgParsed = await this.prisma.statPublicJob.aggregate({
       _avg: { parsedCount: true },
@@ -186,6 +137,7 @@ export class StatPublicService {
         ? Math.floor((Date.now() - +firstJob.startedAt) / (1000 * 60 * 60 * 24))
         : 0,
       totalParsedChannels: totalParsedChannels._count.channelId,
+      totalParsedPosts, // Добавляем общее количество постов
       totalRuns: totalJobs,
       averageParsedPerRun: Math.round(avgParsed._avg.parsedCount || 0),
       averageRunDurationMinutes: avgMinutes,

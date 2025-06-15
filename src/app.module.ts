@@ -5,12 +5,13 @@ import { UserModule } from "./user/user.module";
 import { TelegramModule } from "./telegram/telegram.module";
 import { ChannelModule } from "./channel/channel.module";
 import { ArticleModule } from "./article/article.module";
-import { StatPublicModule } from "./stats/stat-public/stat-public.module";
 import { ServeStaticModule } from "@nestjs/serve-static";
 import { join } from "path";
 import { ChannelReviewsModule } from "./reviews/channel-reviews.module";
 import { SitemapModule } from "./sitemap/sitemap.module";
 import { ScheduleModule } from "@nestjs/schedule";
+import { StatPublicModule } from "./stats/stat-public/stat-public.module";
+import { ChannelPostsModule } from "./posts/channel-posts.module";
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { ScheduleModule } from "@nestjs/schedule";
     StatPublicModule,
     ChannelReviewsModule,
     SitemapModule,
+    ChannelPostsModule,
   ],
 })
 export class AppModule {}
