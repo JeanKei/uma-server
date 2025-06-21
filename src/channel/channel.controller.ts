@@ -55,7 +55,8 @@ export class ChannelController {
     @Query("sortBy") sortBy?: SortField,
     @Query("sortOrder") sortOrder?: SortOrder,
     @Query("searchQuery") searchQuery?: string,
-    @Query("categories") categories?: string
+    @Query("categories") categories?: string,
+    @Query("isVerified") isVerified?: string
   ) {
     const filter: ChannelQueryInput = {
       page: Number(page),
@@ -73,6 +74,7 @@ export class ChannelController {
         maxCpv: maxCpv ? Number(maxCpv) : undefined,
         searchQuery,
         categories: categories ? categories.split(",") : undefined,
+        isVerified: isVerified ? isVerified === "true" : undefined,
       },
       sortBy,
       sortOrder,
@@ -97,7 +99,8 @@ export class ChannelController {
     @Query("sortBy") sortBy?: SortField,
     @Query("sortOrder") sortOrder?: SortOrder,
     @Query("searchQuery") searchQuery?: string,
-    @Query("categories") categories?: string
+    @Query("categories") categories?: string,
+    @Query("isVerified") isVerified?: string
   ) {
     const filter: ChannelQueryInput = {
       page: Number(page),
@@ -115,6 +118,7 @@ export class ChannelController {
         maxCpv: maxCpv ? Number(maxCpv) : undefined,
         searchQuery,
         categories: categories ? categories.split(",") : undefined,
+        isVerified: isVerified ? isVerified === "true" : undefined,
       },
       sortBy,
       sortOrder,

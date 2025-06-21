@@ -11,6 +11,7 @@ export interface ChannelFilterInput {
   maxCpv?: number;
   searchQuery?: string;
   categories?: string[];
+  isVerified?: boolean;
 }
 
 export type SortField = "subscribers" | "view" | "er" | "cpv" | "price";
