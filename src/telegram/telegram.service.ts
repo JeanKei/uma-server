@@ -25,15 +25,23 @@ export class TelegramService {
   async handleAction(
     ctx: Context,
     action: string,
-    channelId: string,
+    id: string,
     clientId: string
   ) {
     switch (action) {
       case "approve":
       case "reject":
-        return this.moderationActions.handle(ctx, action, channelId, clientId);
+        return this.moderationActions.handle(ctx, action, id, clientId);
+      case "verify_approve":
+      case "verify_reject":
+        return this.moderationActions.handleVerification(
+          ctx,
+          action,
+          id,
+          clientId
+        );
       case "start_chat":
-        return this.chatActions.startChat(ctx, channelId, clientId);
+        return this.chatActions.startChat(ctx, id, clientId);
     }
   }
 

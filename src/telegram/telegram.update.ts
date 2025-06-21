@@ -15,7 +15,9 @@ export class TelegramUpdate {
     await ctx.reply("Бот запущен. Ожидаю действий.");
   }
 
-  @Action(/^(approve|reject|start_chat):(.+):(.+)$/)
+  @Action(
+    /^(approve|reject|start_chat|verify_approve|verify_reject):(.+):(.+)$/
+  )
   async onAction(@Ctx() ctx: Context) {
     const data = "data" in ctx.callbackQuery ? ctx.callbackQuery.data : null;
     if (!data) return;

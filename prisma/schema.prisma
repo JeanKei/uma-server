@@ -15,8 +15,10 @@ model User {
   rights     Role[]    @default([USER])
   article    Article[]
   channels   Channel[]
+  ChannelVerification ChannelVerification[]
 
   @@map("users")
+  
 }
 
 model Channel {
@@ -42,7 +44,7 @@ model Channel {
   user              User?               @relation(fields: [userId], references: [id])
   stats             Stats?
   posts             Post[]
-
+  ChannelVerification ChannelVerification[]
   @@map("channels")
 }
 
@@ -168,4 +170,18 @@ enum ChannelStatus {
   MODERATION
   APPROVED
   REJECTED
+}
+
+model ChannelVerification {
+  id        String   @id @default(uuid())
+  channelId String   @map("channel_id")
+  userId    String   @map("user_id")
+  url       String
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  channel   Channel  @relation(fields: [channelId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("channel_verification")
 }

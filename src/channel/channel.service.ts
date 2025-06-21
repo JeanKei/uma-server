@@ -1,6 +1,10 @@
-import { Injectable, NotFoundException } from "@nestjs/common";
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from "@nestjs/common";
 import { PrismaService } from "src/prisma.service";
-import { ChannelDto } from "./dto/channel.dto";
+import { ChannelDto, VerifyChannelDto } from "./dto/channel.dto";
 import { TelegramService } from "@/telegram/telegram.service";
 import { TELEGRAM_MODERATORS } from "@/telegram/telegram.constants";
 import { Markup } from "telegraf";
@@ -332,5 +336,84 @@ export class ChannelService {
     });
     console.log("delete result:", deletedChannel); // Debug log
     return deletedChannel;
+  }
+
+  async verify(dto: VerifyChannelDto, userId: string) {
+    const channel = await this.prisma.channel.findUnique({
+      where: { url: dto.url },
+    });
+
+    if (!channel) {
+      throw new NotFoundException("Канал не найден");
+    }
+
+    const existingVerification =
+      await this.prisma.channelVerification.findFirst({
+        where: {
+          channelId: channel.id,
+          userId,
+          status: "PENDING",
+        },
+      });
+
+    if (existingVerification) {
+      throw new BadRequestException("Запрос на подтверждение уже отправлен");
+    }
+
+    const verification = await this.prisma.channelVerification.create({
+      data: {
+        channelId: channel.id,
+        userId,
+        url: dto.url,
+        status: "PENDING",
+      },
+    });
+
+    console.log("verify result:", verification); // Debug log
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { name: true, telegramId: true },
+    });
+
+    if (user?.telegramId) {
+      await this.telegram.sendMessage(
+        Number(user.telegramId),
+        `✅ Запрос на подтверждение канала <b>${dto.url}</b> отправлен. Ожидайте решения модераторов.`,
+        { parse_mode: "HTML" }
+      );
+    }
+
+    const inlineKeyboard = Markup.inlineKeyboard([
+      [
+        Markup.button.callback(
+          "💬 Связаться с клиентом",
+          `start_chat:${channel.id}:${user?.telegramId}`
+        ),
+      ],
+      [
+        Markup.button.callback(
+          "✅ Подтвердить",
+          `verify_approve:${verification.id}:${user?.telegramId}`
+        ),
+        Markup.button.callback(
+          "❌ Отклонить",
+          `verify_reject:${verification.id}:${user?.telegramId}`
+        ),
+      ],
+    ]);
+
+    for (const modId of TELEGRAM_MODERATORS) {
+      await this.telegram.sendMessage(
+        modId,
+        `📩 Пользователь @${user?.name ?? "пользователь"} запросил подтверждение прав на канал:\n📎 ${dto.url}`,
+        {
+          parse_mode: "HTML",
+          ...inlineKeyboard,
+        }
+      );
+    }
+
+    return { message: "Запрос на подтверждение отправлен" };
   }
 }

@@ -66,3 +66,9 @@ export class ChannelDto {
   @IsString({ each: true })
   categoryIds?: string[];
 }
+
+export class VerifyChannelDto {
+  @IsString()
+  @IsNotEmpty()
+  url: string;
+}

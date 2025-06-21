@@ -14,7 +14,7 @@ import {
   UseInterceptors,
 } from "@nestjs/common";
 import { ChannelService } from "./channel.service";
-import { ChannelDto } from "./dto/channel.dto";
+import { ChannelDto, VerifyChannelDto } from "./dto/channel.dto";
 import { Auth } from "src/auth/decorators/auth.decorator";
 import { CurrentUser } from "@/auth/decorators/user.decorator";
 import {
@@ -173,5 +173,16 @@ export class ChannelController {
   @Delete(":id")
   async delete(@Param("id") id: string) {
     return this.channelService.delete(id);
+  }
+
+  @Auth()
+  @Post("verify")
+  @HttpCode(200)
+  @UsePipes(new ValidationPipe())
+  async verify(
+    @Body() dto: VerifyChannelDto,
+    @CurrentUser("id") userId: string
+  ) {
+    return this.channelService.verify(dto, userId);
   }
 }
