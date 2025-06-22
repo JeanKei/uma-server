@@ -1,6 +1,7 @@
 import { PrismaClient, ChannelStatus } from "@prisma/client";
 import * as fs from "fs/promises";
 import * as path from "path";
+import slugify from "slugify";
 
 const prisma = new PrismaClient();
 
@@ -14,6 +15,16 @@ function toFloatOrUndefined(value: any): number | undefined {
   return value === null || value === undefined || value === ""
     ? undefined
     : parseFloat(value);
+}
+
+function transliterate(text: string): string {
+  return slugify(text, {
+    replacement: "-",
+    lower: true,
+    strict: true,
+    locale: "ru",
+    trim: true,
+  });
 }
 
 async function main() {
@@ -43,11 +54,27 @@ async function main() {
       link,
     } = item;
 
+    // Генерация slug для категории
+    const baseSlug = transliterate(category);
+    let uniqueSlug = baseSlug;
+    let suffix = 1;
+
+    while (
+      await prisma.category.findFirst({
+        where: { slug: uniqueSlug },
+      })
+    ) {
+      uniqueSlug = `${baseSlug}-${suffix++}`;
+    }
+
     // Категория
     const categoryRecord = await prisma.category.upsert({
       where: { name: category },
       update: {},
-      create: { name: category },
+      create: {
+        name: category,
+        slug: uniqueSlug,
+      },
     });
 
     // Канал

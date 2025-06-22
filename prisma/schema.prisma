@@ -123,6 +123,7 @@ model Post {
 model Category {
   id                String              @id @default(cuid())
   name              String              @unique
+  slug              String              @unique
   categoriesChannel CategoriesChannel[]
 
   @@map("categories")
