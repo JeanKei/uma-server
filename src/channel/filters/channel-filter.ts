@@ -7,6 +7,7 @@ import { buildPricesWhere } from "./filter-component/price";
 import { buildErWhere } from "./filter-component/er";
 import { buildCpvWhere } from "./filter-component/cpv";
 import { buildIsVerifiedWhere } from "./filter-component/is-verified";
+import { buildGenderWhere } from "./filter-component/gender";
 
 export async function buildChannelFilter(
   params: ChannelFilterInput,
@@ -26,6 +27,7 @@ export async function buildChannelFilter(
     searchQuery,
     categories,
     isVerified,
+    gender,
   } = params;
 
   const maxValues = await channelService.getMaxValues();
@@ -69,6 +71,8 @@ export async function buildChannelFilter(
 
   const isVerifiedWhere = await buildIsVerifiedWhere(isVerified);
 
+  const genderWhere = await buildGenderWhere(gender);
+
   const where: Prisma.ChannelWhereInput = {
     AND: [
       subscribersWhere,
@@ -79,6 +83,7 @@ export async function buildChannelFilter(
       searchWhere,
       categoriesWhere,
       isVerifiedWhere,
+      genderWhere,
     ],
   };
 

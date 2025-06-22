@@ -20,7 +20,7 @@ export class ChannelFilterDto {
 
   @IsOptional()
   @Type(() => Number)
-  minGenderM?: number;
+  gender?: number;
 
   @IsOptional()
   @Type(() => Number)

@@ -56,7 +56,8 @@ export class ChannelController {
     @Query("sortOrder") sortOrder?: SortOrder,
     @Query("searchQuery") searchQuery?: string,
     @Query("categories") categories?: string,
-    @Query("isVerified") isVerified?: string
+    @Query("isVerified") isVerified?: string,
+    @Query("gender") gender?: string
   ) {
     const filter: ChannelQueryInput = {
       page: Number(page),
@@ -75,6 +76,7 @@ export class ChannelController {
         searchQuery,
         categories: categories ? categories.split(",") : undefined,
         isVerified: isVerified ? isVerified === "true" : undefined,
+        gender: gender ? Number(gender) : undefined,
       },
       sortBy,
       sortOrder,
@@ -100,7 +102,8 @@ export class ChannelController {
     @Query("sortOrder") sortOrder?: SortOrder,
     @Query("searchQuery") searchQuery?: string,
     @Query("categories") categories?: string,
-    @Query("isVerified") isVerified?: string
+    @Query("isVerified") isVerified?: string,
+    @Query("gender") gender?: string
   ) {
     const filter: ChannelQueryInput = {
       page: Number(page),
@@ -119,6 +122,7 @@ export class ChannelController {
         searchQuery,
         categories: categories ? categories.split(",") : undefined,
         isVerified: isVerified ? isVerified === "true" : undefined,
+        gender: gender ? Number(gender) : undefined,
       },
       sortBy,
       sortOrder,

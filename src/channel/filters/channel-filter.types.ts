@@ -12,6 +12,7 @@ export interface ChannelFilterInput {
   searchQuery?: string;
   categories?: string[];
   isVerified?: boolean;
+  gender?: number;
 }
 
 export type SortField = "subscribers" | "view" | "er" | "cpv" | "price";
