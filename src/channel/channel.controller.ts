@@ -28,14 +28,60 @@ import { FileInterceptor } from "@nestjs/platform-express";
 export class ChannelController {
   constructor(private readonly channelService: ChannelService) {}
 
+  @Get("max-values")
+  async getMaxValues() {
+    return this.channelService.getMaxValues();
+  }
+
   @Get("categories")
   async getCategories() {
     return this.channelService.getCategories();
   }
-
-  @Get("max-values")
-  async getMaxValues() {
-    return this.channelService.getMaxValues();
+  @Get("by-category/:slug")
+  async getByCategory(
+    @Param("slug") slug: string,
+    @Query("page") page: string = "1",
+    @Query("limit") limit: string = "10",
+    @Query("minSubscribers") minSubscribers?: string,
+    @Query("maxSubscribers") maxSubscribers?: string,
+    @Query("minView") minView?: string,
+    @Query("maxView") maxView?: string,
+    @Query("minEr") minEr?: string,
+    @Query("maxEr") maxEr?: string,
+    @Query("minPrice") minPrice?: string,
+    @Query("maxPrice") maxPrice?: string,
+    @Query("minCpv") minCpv?: string,
+    @Query("maxCpv") maxCpv?: string,
+    @Query("sortBy") sortBy?: SortField,
+    @Query("sortOrder") sortOrder?: SortOrder,
+    @Query("searchQuery") searchQuery?: string,
+    @Query("categories") categories?: string,
+    @Query("isVerified") isVerified?: string,
+    @Query("gender") gender?: string
+  ) {
+    const filter: ChannelQueryInput = {
+      page: Number(page),
+      limit: Number(limit),
+      filter: {
+        minSubscribers: minSubscribers ? Number(minSubscribers) : undefined,
+        maxSubscribers: maxSubscribers ? Number(maxSubscribers) : undefined,
+        minView: minView ? Number(minView) : undefined,
+        maxView: maxView ? Number(maxView) : undefined,
+        minEr: minEr ? Number(minEr) : undefined,
+        maxEr: maxEr ? Number(maxEr) : undefined,
+        minPrice: minPrice ? Number(minPrice) : undefined,
+        maxPrice: maxPrice ? Number(maxPrice) : undefined,
+        minCpv: minCpv ? Number(minCpv) : undefined,
+        maxCpv: maxCpv ? Number(maxCpv) : undefined,
+        searchQuery,
+        categories: categories ? categories.split(",") : undefined,
+        isVerified: isVerified ? isVerified === "true" : undefined,
+        gender: gender ? Number(gender) : undefined,
+      },
+      sortBy,
+      sortOrder,
+    };
+    return this.channelService.getByCategorySlug(slug, filter);
   }
 
   @Get()

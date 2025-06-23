@@ -21,18 +21,6 @@ export class ChannelService {
     private readonly fileService: FileService
   ) {}
 
-  async getCategories() {
-    const categories = await this.prisma.category.findMany({
-      select: {
-        id: true,
-        name: true,
-      },
-      orderBy: { name: "asc" },
-    });
-    console.log("ChannelService.getCategories result:", categories); // Debug log
-    return categories;
-  }
-
   async getMaxValues() {
     const statInitialMax = await this.prisma.stats.aggregate({
       _max: {
@@ -56,6 +44,79 @@ export class ChannelService {
       maxEr: statInitialMax._max.er || 0,
       maxCpv: statInitialMax._max.cpv || 0,
     };
+  }
+
+  async getCategories() {
+    const categories = await this.prisma.category.findMany({
+      select: {
+        id: true,
+        name: true,
+        slug: true,
+        seoText: true,
+      },
+      orderBy: { name: "asc" },
+    });
+    console.log("ChannelService.getCategories result:", categories); // Debug log
+    return categories;
+  }
+
+  async getByCategorySlug(slug: string, query: ChannelQueryInput) {
+    const page = query.page || 1;
+    const limit = query.limit || 10;
+    const skip = (page - 1) * limit;
+    const sortBy = query.sortBy || "createdAt";
+    const sortOrder = query.sortOrder || "desc";
+    const filter = query.filter || {};
+
+    // Находим категорию по slug
+    const category = await this.prisma.category.findFirst({
+      where: { slug },
+    });
+
+    if (!category) {
+      throw new NotFoundException("Категория не найдена");
+    }
+
+    // Устанавливаем категорию в фильтры
+    filter.categories = filter.categories
+      ? [...new Set([...filter.categories, category.id])]
+      : [category.id];
+
+    const filterWhere = await buildChannelFilter(filter, this);
+
+    const where = {
+      ...filterWhere,
+      status: ChannelStatus.APPROVED,
+    };
+
+    console.log("getByCategorySlug query:", query);
+    console.log("getByCategorySlug where:", JSON.stringify(where, null, 2));
+
+    const orderBy =
+      sortBy === "createdAt"
+        ? { createdAt: sortOrder }
+        : { stats: { [sortBy]: sortOrder } };
+
+    const [items, total] = await Promise.all([
+      this.prisma.channel.findMany({
+        where,
+        skip,
+        take: limit,
+        orderBy,
+        include: {
+          categoriesChannel: {
+            include: { category: true },
+          },
+          stats: true,
+        },
+      }),
+      this.prisma.channel.count({ where }),
+    ]);
+
+    console.log("getByCategorySlug result:", { items: items.length, total });
+
+    const hasMore = page * limit < total;
+    return { items, total, page, limit, hasMore };
   }
 
   async getAll(query: ChannelQueryInput) {

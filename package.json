@@ -22,7 +22,8 @@
     "ngrok": "ngrok http 4200",
     "seed:stats": "ts-node prisma/seeds-channels/stats/stats.ts",
     "seed:descriptions": "ts-node prisma/seeds-channels/descriptions/descriptions.ts",
-    "seed:reviews": "ts-node prisma/seeds-channels/reviews/reviews.ts"
+    "seed:reviews": "ts-node prisma/seeds-channels/reviews/reviews.ts",
+    "seed:seo-category": "ts-node prisma/seeds-channels/seo-text/category.ts"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^2.0.2",
