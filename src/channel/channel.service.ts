@@ -399,13 +399,102 @@ export class ChannelService {
     return deletedChannel;
   }
 
+  // async verify(dto: VerifyChannelDto, userId: string) {
+  //   const channel = await this.prisma.channel.findUnique({
+  //     where: { url: dto.url },
+  //   });
+
+  //   if (!channel) {
+  //     throw new NotFoundException("Канал не найден");
+  //   }
+
+  //   const existingVerification =
+  //     await this.prisma.channelVerification.findFirst({
+  //       where: {
+  //         channelId: channel.id,
+  //         userId,
+  //         status: "PENDING",
+  //       },
+  //     });
+
+  //   if (existingVerification) {
+  //     throw new BadRequestException("Запрос на подтверждение уже отправлен");
+  //   }
+
+  //   const verification = await this.prisma.channelVerification.create({
+  //     data: {
+  //       channelId: channel.id,
+  //       userId,
+  //       url: dto.url,
+  //       status: "PENDING",
+  //     },
+  //   });
+
+  //   console.log("verify result:", verification); // Debug log
+
+  //   const user = await this.prisma.user.findUnique({
+  //     where: { id: userId },
+  //     select: { name: true, telegramId: true },
+  //   });
+
+  //   if (user?.telegramId) {
+  //     await this.telegram.sendMessage(
+  //       Number(user.telegramId),
+  //       `✅ Запрос на подтверждение канала <b>${dto.url}</b> отправлен. Ожидайте решения модераторов.`,
+  //       { parse_mode: "HTML" }
+  //     );
+  //   }
+
+  //   const inlineKeyboard = Markup.inlineKeyboard([
+  //     [
+  //       Markup.button.callback(
+  //         "💬 Связаться с клиентом",
+  //         `start_chat:${channel.id}:${user?.telegramId}`
+  //       ),
+  //     ],
+  //     [
+  //       Markup.button.callback(
+  //         "✅ Подтвердить",
+  //         `verify_approve:${verification.id}:${user?.telegramId}`
+  //       ),
+  //       Markup.button.callback(
+  //         "❌ Отклонить",
+  //         `verify_reject:${verification.id}:${user?.telegramId}`
+  //       ),
+  //     ],
+  //   ]);
+
+  //   for (const modId of TELEGRAM_MODERATORS) {
+  //     await this.telegram.sendMessage(
+  //       modId,
+  //       `📩 Пользователь @${user?.name ?? "пользователь"} запросил подтверждение прав на канал:\n📎 ${dto.url}`,
+  //       {
+  //         parse_mode: "HTML",
+  //         ...inlineKeyboard,
+  //       }
+  //     );
+  //   }
+
+  //   return { message: "Запрос на подтверждение отправлен" };
+  // }
+
   async verify(dto: VerifyChannelDto, userId: string) {
+    console.log("verify input url:", dto.url); // Debug log
+
     const channel = await this.prisma.channel.findUnique({
       where: { url: dto.url },
+      include: { user: { select: { name: true, telegramId: true } } },
     });
 
     if (!channel) {
-      throw new NotFoundException("Канал не найден");
+      throw new NotFoundException({
+        message: "Канал не найден",
+        suggestion: "Добавьте канал в разделе Мои Каналы",
+      });
+    }
+
+    if (channel.userId === userId) {
+      throw new BadRequestException("Канал уже принадлежит вам");
     }
 
     const existingVerification =
@@ -465,14 +554,13 @@ export class ChannelService {
     ]);
 
     for (const modId of TELEGRAM_MODERATORS) {
-      await this.telegram.sendMessage(
-        modId,
-        `📩 Пользователь @${user?.name ?? "пользователь"} запросил подтверждение прав на канал:\n📎 ${dto.url}`,
-        {
-          parse_mode: "HTML",
-          ...inlineKeyboard,
-        }
-      );
+      const message = channel.userId
+        ? `📩 Пользователь @${user?.name ?? "пользователь"} запросил подтверждение прав на канал:\n📎 ${dto.url}\n⚠️ Текущий владелец: @${channel.user?.name ?? "неизвестно"}`
+        : `📩 Пользователь @${user?.name ?? "пользователь"} запросил подтверждение прав на канал:\n📎 ${dto.url}`;
+      await this.telegram.sendMessage(modId, message, {
+        parse_mode: "HTML",
+        ...inlineKeyboard,
+      });
     }
 
     return { message: "Запрос на подтверждение отправлен" };
