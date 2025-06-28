@@ -270,6 +270,102 @@ export class ChannelService {
     return channel;
   }
 
+  // async create(dto: ChannelDto, userId: string, file?: Express.Multer.File) {
+  //   let avatarUrl: string | undefined;
+
+  //   if (file) {
+  //     const fileResponse = await this.fileService.saveAvatar(file, dto.url);
+  //     avatarUrl = fileResponse.url;
+  //   }
+
+  //   const { avatarFile, categoryIds, ...channelData } = dto;
+
+  //   const createdChannel = await this.prisma.channel.create({
+  //     data: {
+  //       ...channelData,
+  //       avatar: avatarUrl,
+  //       userId,
+  //       status: ChannelStatus.MODERATION,
+  //       categoriesChannel: categoryIds?.length
+  //         ? {
+  //             create: categoryIds.map((categoryId) => ({
+  //               category: { connect: { id: categoryId } },
+  //             })),
+  //           }
+  //         : undefined,
+  //       stats: {
+  //         create: {
+  //           isVerified: false,
+  //         },
+  //       },
+  //     },
+  //     include: {
+  //       categoriesChannel: {
+  //         include: { category: true },
+  //       },
+  //       stats: true,
+  //     },
+  //   });
+
+  //   console.log("create result:", createdChannel);
+
+  //   const user = await this.prisma.user.findUnique({
+  //     where: { id: userId },
+  //     select: { name: true, telegramId: true },
+  //   });
+
+  //   if (user?.telegramId) {
+  //     await this.telegram.sendMessage(
+  //       Number(user.telegramId),
+  //       `✅ Ваш канал <b>${createdChannel.url}</b> успешно добавлен. Ожидайте модерации.`,
+  //       { parse_mode: "HTML" }
+  //     );
+  //   }
+
+  //   const inlineKeyboard = Markup.inlineKeyboard([
+  //     [
+  //       Markup.button.callback(
+  //         "💬 Связаться с клиентом",
+  //         `start_chat:${createdChannel.id}:${user?.telegramId}`
+  //       ),
+  //     ],
+  //     [
+  //       Markup.button.callback(
+  //         "✅ Одобрить",
+  //         `approve:${createdChannel.id}:${user?.telegramId}`
+  //       ),
+  //       Markup.button.callback(
+  //         "❌ Отклонить",
+  //         `reject:${createdChannel.id}:${user?.telegramId}`
+  //       ),
+  //     ],
+  //   ]);
+
+  //   // Отправляем только MODERATOR_CHANNELS
+  //   await this.telegram.sendMessage(
+  //     MODERATOR_CHANNELS,
+  //     `📥 Новый канал от @${user?.name ?? "пользователь"}:\n📎 ${createdChannel.url}`,
+  //     {
+  //       parse_mode: "HTML",
+  //       ...inlineKeyboard,
+  //     }
+  //   );
+
+  //   // И в групповой чат, если он задан
+  //   if (TELEGRAM_GROUP_CHAT_ID) {
+  //     await this.telegram.sendMessage(
+  //       TELEGRAM_GROUP_CHAT_ID,
+  //       `📥 Новый канал от @${user?.name ?? "пользователь"}:\n📎 ${createdChannel.url}`,
+  //       {
+  //         parse_mode: "HTML",
+  //         ...inlineKeyboard,
+  //       }
+  //     );
+  //   }
+
+  //   return createdChannel;
+  // }
+
   async create(dto: ChannelDto, userId: string, file?: Express.Multer.File) {
     let avatarUrl: string | undefined;
 
@@ -322,7 +418,7 @@ export class ChannelService {
       );
     }
 
-    const inlineKeyboard = Markup.inlineKeyboard([
+    const moderatorKeyboard = Markup.inlineKeyboard([
       [
         Markup.button.callback(
           "💬 Связаться с клиентом",
@@ -341,26 +437,22 @@ export class ChannelService {
       ],
     ]);
 
-    // Отправляем только MODERATOR_CHANNELS
-    await this.telegram.sendMessage(
-      MODERATOR_CHANNELS,
-      `📥 Новый канал от @${user?.name ?? "пользователь"}:\n📎 ${createdChannel.url}`,
-      {
-        parse_mode: "HTML",
-        ...inlineKeyboard,
-      }
-    );
+    const message = `📥 Новый канал от @${user?.name ?? "пользователь"}:\n📎 ${createdChannel.url}`;
 
-    // И в групповой чат, если он задан
+    // В модераторский чат — с кнопками
+    await this.telegram.sendMessage(MODERATOR_CHANNELS, message, {
+      parse_mode: "HTML",
+      ...moderatorKeyboard,
+    });
+
+    // В групповой чат — без кнопок + пояснение
     if (TELEGRAM_GROUP_CHAT_ID) {
-      await this.telegram.sendMessage(
-        TELEGRAM_GROUP_CHAT_ID,
-        `📥 Новый канал от @${user?.name ?? "пользователь"}:\n📎 ${createdChannel.url}`,
-        {
-          parse_mode: "HTML",
-          ...inlineKeyboard,
-        }
-      );
+      const groupMessage =
+        message +
+        `\n\n🔒 <i>Действия с заявкой (одобрить, отклонить, связаться с клиентом) доступны только модераторам.</i>`;
+      await this.telegram.sendMessage(TELEGRAM_GROUP_CHAT_ID, groupMessage, {
+        parse_mode: "HTML",
+      });
     }
 
     return createdChannel;
@@ -482,7 +574,7 @@ export class ChannelService {
       );
     }
 
-    const inlineKeyboard = Markup.inlineKeyboard([
+    const moderatorKeyboard = Markup.inlineKeyboard([
       [
         Markup.button.callback(
           "💬 Связаться с клиентом",
@@ -505,15 +597,18 @@ export class ChannelService {
       ? `📩 Пользователь @${user?.name ?? "пользователь"} запросил подтверждение прав на канал:\n📎 ${dto.url}\n⚠️ Текущий владелец: @${channel.user?.name ?? "неизвестно"}`
       : `📩 Пользователь @${user?.name ?? "пользователь"} запросил подтверждение прав на канал:\n📎 ${dto.url}`;
 
+    // Отправляем с кнопками в модераторский чат
     await this.telegram.sendMessage(MODERATOR_CHANNELS, message, {
       parse_mode: "HTML",
-      ...inlineKeyboard,
+      ...moderatorKeyboard,
     });
 
+    // В групповой чат — только текст без кнопок + информационное сообщение
     if (TELEGRAM_GROUP_CHAT_ID) {
-      await this.telegram.sendMessage(TELEGRAM_GROUP_CHAT_ID, message, {
+      const groupMessage = `${message}\n\n🔒 <i>Действия с заявкой (подтвердить, отклонить, связаться с клиентом) доступны только модераторам.</i>`;
+      await this.telegram.sendMessage(TELEGRAM_GROUP_CHAT_ID, groupMessage, {
         parse_mode: "HTML",
-        ...inlineKeyboard,
+        // Кнопок НЕ передаём
       });
     }
 
