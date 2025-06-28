@@ -14,6 +14,7 @@ import { StatPublicModule } from "./stats/stat-public/stat-public.module";
 import { ChannelPostsModule } from "./posts/channel-posts.module";
 import { OrderUmaBotModule } from "./orders/order-uma-bot/order-uma-bot.module";
 import { OrderPackagesModule } from "./orders/order-packages/order-packages.module";
+import { OrderChannelsModule } from "./orders/order-channels/order-channels.module";
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { OrderPackagesModule } from "./orders/order-packages/order-packages.modu
     ChannelPostsModule,
     OrderUmaBotModule,
     OrderPackagesModule,
+    OrderChannelsModule,
   ],
 })
 export class AppModule {}

@@ -2,21 +2,19 @@ import { Injectable } from "@nestjs/common";
 import { path } from "app-root-path";
 import { ensureDir, writeFile } from "fs-extra";
 import * as sharp from "sharp";
-import { FileResponse } from "./file.interface";
+import { OrderFileResponse } from "./order-file.interface";
 
 @Injectable()
-export class FileService {
-  async saveAvatar(
-    file: Express.Multer.File,
-    channelUrl: string
-  ): Promise<FileResponse> {
+export class OrderFileService {
+  async saveFile(file: Express.Multer.File): Promise<OrderFileResponse> {
     try {
-      const uploadedFolder = `${path}/uploads/channels-img`;
+      const uploadedFolder = `${path}/uploads/order-img`;
       await ensureDir(uploadedFolder);
 
-      const sanitizedUrl = channelUrl.replace(/[^a-zA-Z0-9]/g, "_");
       const fileExtension = file.originalname.split(".").pop() || "jpg";
-      const fileName = `${sanitizedUrl}.${fileExtension}`;
+
+      const uniqueId = `${Date.now()}_${Math.floor(Math.random() * 10000)}`;
+      const fileName = `${uniqueId}.${fileExtension}`;
 
       const resizedBuffer = await sharp(file.buffer)
         .resize(500, 500, { fit: "cover" })
@@ -25,7 +23,7 @@ export class FileService {
       await writeFile(`${uploadedFolder}/${fileName}`, resizedBuffer);
 
       return {
-        url: `/channels-img/${fileName}`,
+        url: `/order-img/${fileName}`,
         name: fileName,
       };
     } catch (error) {
