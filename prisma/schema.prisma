@@ -8,43 +8,47 @@ datasource db {
 }
 
 model User {
-  id         String    @id @default(cuid())
-  name       String?
-  avatarPath String?   @map("avatar_path")
-  telegramId String?   @unique @map("telegram_id")
-  rights     Role[]    @default([USER])
-  article    Article[]
-  channels   Channel[]
+  id                  String                @id @default(cuid())
+  name                String?
+  avatarPath          String?               @map("avatar_path")
+  telegramId          String?               @unique @map("telegram_id")
+  rights              Role[]                @default([USER])
+  article             Article[]
   ChannelVerification ChannelVerification[]
+  channels            Channel[]
+  OrderUmaBot OrderUmaBot[]
+  OrderPackages OrderPackages[]
 
   @@map("users")
-  
+
+
 }
 
 model Channel {
-  id                String              @id @default(cuid())
-  url               String              @unique @map("channel_url")
-  title             String?
-  description       String?
-  avatar            String?             
-  userId            String?             @map("user_id")
-  status            ChannelStatus       @default(MODERATION)
-  isActual          Boolean             @default(false) @map("is_actual")
-  price             Int?
-  format24h         Boolean             @default(true) @map("format_24h")
-  format48h         Boolean             @default(true) @map("format_48h")
-  format72h         Boolean             @default(true) @map("format_72h")
-  formatNative      Boolean             @default(true) @map("format_native")
-  format7d          Boolean             @default(true) @map("format_7d")
-  formatRepost      Boolean             @default(true) @map("format_repost")
-  createdAt         DateTime            @default(now()) @map("created_at")
-  updatedAt         DateTime            @updatedAt @map("updated_at")
-  categoriesChannel CategoriesChannel[]
-  channelReviews    ChannelReviews[]
-  user              User?               @relation(fields: [userId], references: [id])
-  stats             Stats?
-  posts             Post[]
+  id                  String                @id @default(cuid())
+  url                 String                @unique @map("channel_url")
+  title               String?
+  description         String?
+  avatar              String?
+  userId              String?               @map("user_id")
+  status              ChannelStatus         @default(MODERATION)
+  isActual            Boolean               @default(false) @map("is_actual")
+  price               Int?
+  format24h           Boolean               @default(true) @map("format_24h")
+  format48h           Boolean               @default(true) @map("format_48h")
+  format72h           Boolean               @default(true) @map("format_72h")
+  formatNative        Boolean               @default(true) @map("format_native")
+  format7d            Boolean               @default(true) @map("format_7d")
+  formatRepost        Boolean               @default(true) @map("format_repost")
+  createdAt           DateTime              @default(now()) @map("created_at")
+  updatedAt           DateTime              @updatedAt @map("updated_at")
+  categoriesChannel   CategoriesChannel[]
+  channelReviews      ChannelReviews[]
   ChannelVerification ChannelVerification[]
+  user                User?                 @relation(fields: [userId], references: [id])
+  posts               Post[]
+  stats               Stats?
+
   @@map("channels")
 }
 
@@ -95,7 +99,7 @@ model Stats {
   er          Float?   @default(0)
   cpv         Float?   @default(0)
   price       Int?     @default(0)
-  imgSrc      String?  @map("img_src") @default("channels-img/default.png")
+  imgSrc      String?  @default("channels-img/default.png") @map("img_src")
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
   channel     Channel  @relation(fields: [channelId], references: [id])
@@ -104,18 +108,18 @@ model Stats {
 }
 
 model Post {
-  id           String   @id @default(cuid())
-  channelId    String   @map("channel_id")
-  dataPost     String   @unique @map("data_post") 
-  messageUrl   String   @map("message_url")
-  messageText  String?  @map("message_text")
-  views        Int?     @default(0)
-  datetime     DateTime?
-  photos       String[] @default([]) 
-  videos       String[] @default([]) 
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
-  channel      Channel  @relation(fields: [channelId], references: [id])
+  id          String    @id @default(cuid())
+  channelId   String    @map("channel_id")
+  dataPost    String    @unique @map("data_post")
+  messageUrl  String    @map("message_url")
+  messageText String?   @map("message_text")
+  views       Int?      @default(0)
+  datetime    DateTime?
+  photos      String[]  @default([])
+  videos      String[]  @default([])
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  channel     Channel   @relation(fields: [channelId], references: [id])
 
   @@map("posts")
 }
@@ -161,6 +165,20 @@ model Article {
   @@map("articles")
 }
 
+model ChannelVerification {
+  id        String   @id @default(uuid())
+  channelId String   @map("channel_id")
+  userId    String   @map("user_id")
+  url       String
+  status    String   @default("PENDING")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  channel   Channel  @relation(fields: [channelId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@map("channel_verification")
+}
+
 enum Role {
   USER
   PREMIUM
@@ -174,16 +192,28 @@ enum ChannelStatus {
   REJECTED
 }
 
-model ChannelVerification {
-  id        String   @id @default(uuid())
-  channelId String   @map("channel_id")
-  userId    String   @map("user_id")
-  url       String
-  status    String   @default("PENDING")
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  channel   Channel  @relation(fields: [channelId], references: [id])
-  user      User     @relation(fields: [userId], references: [id])
+model OrderUmaBot {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  user       User     @relation(fields: [userId], references: [id])
+  title      String
+  price      String
+  priceYear  String?  @map("price_year")
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
 
-  @@map("channel_verification")
+  @@map("orders_uma_bot")
+}
+
+model OrderPackages {
+  id         String   @id @default(cuid())
+  userId     String   @map("user_id")
+  user       User     @relation(fields: [userId], references: [id])
+  title      String
+  subtitle   String
+  price      String
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@map("orders_packages")
 }

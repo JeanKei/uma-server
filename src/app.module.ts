@@ -12,6 +12,8 @@ import { SitemapModule } from "./sitemap/sitemap.module";
 import { ScheduleModule } from "@nestjs/schedule";
 import { StatPublicModule } from "./stats/stat-public/stat-public.module";
 import { ChannelPostsModule } from "./posts/channel-posts.module";
+import { OrderUmaBotModule } from "./orders/order-uma-bot/order-uma-bot.module";
+import { OrderPackagesModule } from "./orders/order-packages/order-packages.module";
 
 @Module({
   imports: [
@@ -32,6 +34,8 @@ import { ChannelPostsModule } from "./posts/channel-posts.module";
     ChannelReviewsModule,
     SitemapModule,
     ChannelPostsModule,
+    OrderUmaBotModule,
+    OrderPackagesModule,
   ],
 })
 export class AppModule {}

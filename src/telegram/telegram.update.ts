@@ -7,7 +7,7 @@ import { PrismaService } from "@/prisma.service";
 export class TelegramUpdate {
   constructor(
     private readonly telegramService: TelegramService,
-    private readonly prisma: PrismaService // 👈 добавили PrismaService
+    private readonly prisma: PrismaService
   ) {}
 
   @Start()

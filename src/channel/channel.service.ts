@@ -6,12 +6,16 @@ import {
 import { PrismaService } from "src/prisma.service";
 import { ChannelDto, VerifyChannelDto } from "./dto/channel.dto";
 import { TelegramService } from "@/telegram/telegram.service";
-import { TELEGRAM_MODERATORS } from "@/telegram/telegram.constants";
+// import { TELEGRAM_MODERATORS } from "@/telegram/telegram.constants";
 import { Markup } from "telegraf";
 import { buildChannelFilter } from "./filters/channel-filter";
 import { ChannelStatus } from "@prisma/client";
 import { ChannelQueryInput } from "./filters/channel-filter.types";
 import { FileService } from "@/file/file.service";
+import {
+  MODERATOR_CHANNELS,
+  TELEGRAM_GROUP_CHAT_ID,
+} from "@/telegram/telegram.constants";
 
 @Injectable()
 export class ChannelService {
@@ -266,146 +270,156 @@ export class ChannelService {
     return channel;
   }
 
-  async create(dto: ChannelDto, userId: string, file?: Express.Multer.File) {
-    let avatarUrl: string | undefined;
+  // async create(dto: ChannelDto, userId: string, file?: Express.Multer.File) {
+  //   let avatarUrl: string | undefined;
 
-    if (file) {
-      const fileResponse = await this.fileService.saveAvatar(file, dto.url);
-      avatarUrl = fileResponse.url;
-    }
+  //   if (file) {
+  //     const fileResponse = await this.fileService.saveAvatar(file, dto.url);
+  //     avatarUrl = fileResponse.url;
+  //   }
 
-    const { avatarFile, categoryIds, ...channelData } = dto;
+  //   const { avatarFile, categoryIds, ...channelData } = dto;
 
-    const createdChannel = await this.prisma.channel.create({
-      data: {
-        ...channelData,
-        avatar: avatarUrl,
-        userId,
-        status: ChannelStatus.MODERATION,
-        categoriesChannel: categoryIds?.length
-          ? {
-              create: categoryIds.map((categoryId) => ({
-                category: { connect: { id: categoryId } },
-              })),
-            }
-          : undefined,
-        stats: {
-          create: {
-            isVerified: false,
-          },
-        },
-      },
-      include: {
-        categoriesChannel: {
-          include: { category: true },
-        },
-        stats: true,
-      },
-    });
+  //   const createdChannel = await this.prisma.channel.create({
+  //     data: {
+  //       ...channelData,
+  //       avatar: avatarUrl,
+  //       userId,
+  //       status: ChannelStatus.MODERATION,
+  //       categoriesChannel: categoryIds?.length
+  //         ? {
+  //             create: categoryIds.map((categoryId) => ({
+  //               category: { connect: { id: categoryId } },
+  //             })),
+  //           }
+  //         : undefined,
+  //       stats: {
+  //         create: {
+  //           isVerified: false,
+  //         },
+  //       },
+  //     },
+  //     include: {
+  //       categoriesChannel: {
+  //         include: { category: true },
+  //       },
+  //       stats: true,
+  //     },
+  //   });
 
-    console.log("create result:", createdChannel); // Debug log
+  //   console.log("create result:", createdChannel); // Debug log
 
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
-      select: { name: true, telegramId: true },
-    });
+  //   const user = await this.prisma.user.findUnique({
+  //     where: { id: userId },
+  //     select: { name: true, telegramId: true },
+  //   });
 
-    if (user?.telegramId) {
-      await this.telegram.sendMessage(
-        Number(user.telegramId),
-        `✅ Ваш канал <b>${createdChannel.url}</b> успешно добавлен. Ожидайте модерации.`,
-        { parse_mode: "HTML" }
-      );
-    }
+  //   if (user?.telegramId) {
+  //     await this.telegram.sendMessage(
+  //       Number(user.telegramId),
+  //       `✅ Ваш канал <b>${createdChannel.url}</b> успешно добавлен. Ожидайте модерации.`,
+  //       { parse_mode: "HTML" }
+  //     );
+  //   }
 
-    const inlineKeyboard = Markup.inlineKeyboard([
-      [
-        Markup.button.callback(
-          "💬 Связаться с клиентом",
-          `start_chat:${createdChannel.id}:${user?.telegramId}`
-        ),
-      ],
-      [
-        Markup.button.callback(
-          "✅ Одобрить",
-          `approve:${createdChannel.id}:${user?.telegramId}`
-        ),
-        Markup.button.callback(
-          "❌ Отклонить",
-          `reject:${createdChannel.id}:${user?.telegramId}`
-        ),
-      ],
-    ]);
+  //   const inlineKeyboard = Markup.inlineKeyboard([
+  //     [
+  //       Markup.button.callback(
+  //         "💬 Связаться с клиентом",
+  //         `start_chat:${createdChannel.id}:${user?.telegramId}`
+  //       ),
+  //     ],
+  //     [
+  //       Markup.button.callback(
+  //         "✅ Одобрить",
+  //         `approve:${createdChannel.id}:${user?.telegramId}`
+  //       ),
+  //       Markup.button.callback(
+  //         "❌ Отклонить",
+  //         `reject:${createdChannel.id}:${user?.telegramId}`
+  //       ),
+  //     ],
+  //   ]);
 
-    for (const modId of TELEGRAM_MODERATORS) {
-      await this.telegram.sendMessage(
-        modId,
-        `📥 Новый канал от @${user?.name ?? "пользователь"}:\n📎 ${createdChannel.url}`,
-        {
-          parse_mode: "HTML",
-          ...inlineKeyboard,
-        }
-      );
-    }
+  //   for (const modId of TELEGRAM_MODERATORS) {
+  //     await this.telegram.sendMessage(
+  //       modId,
+  //       `📥 Новый канал от @${user?.name ?? "пользователь"}:\n📎 ${createdChannel.url}`,
+  //       {
+  //         parse_mode: "HTML",
+  //         ...inlineKeyboard,
+  //       }
+  //     );
+  //   }
 
-    return createdChannel;
-  }
+  //   return createdChannel;
+  // }
 
-  async update(id: string, dto: ChannelDto, file?: Express.Multer.File) {
-    await this.getById(id);
+  // async update(id: string, dto: ChannelDto, file?: Express.Multer.File) {
+  //   await this.getById(id);
 
-    let avatarUrl: string | undefined;
+  //   let avatarUrl: string | undefined;
 
-    if (file) {
-      const fileResponse = await this.fileService.saveAvatar(file, dto.url);
-      avatarUrl = fileResponse.url;
-    }
+  //   if (file) {
+  //     const fileResponse = await this.fileService.saveAvatar(file, dto.url);
+  //     avatarUrl = fileResponse.url;
+  //   }
 
-    const { avatarFile, categoryIds, ...channelData } = dto;
+  //   const { avatarFile, categoryIds, ...channelData } = dto;
 
-    const updatedChannel = await this.prisma.channel.update({
-      where: { id },
-      data: {
-        ...channelData,
-        avatar: avatarUrl ?? channelData.avatar,
-        categoriesChannel: {
-          deleteMany: {}, // Удаляем старые привязки
-          create: categoryIds?.map((categoryId) => ({
-            category: { connect: { id: categoryId } },
-          })),
-        },
-      },
-      include: {
-        categoriesChannel: {
-          include: { category: true },
-        },
-        stats: true,
-      },
-    });
+  //   const updatedChannel = await this.prisma.channel.update({
+  //     where: { id },
+  //     data: {
+  //       ...channelData,
+  //       avatar: avatarUrl ?? channelData.avatar,
+  //       categoriesChannel: {
+  //         deleteMany: {}, // Удаляем старые привязки
+  //         create: categoryIds?.map((categoryId) => ({
+  //           category: { connect: { id: categoryId } },
+  //         })),
+  //       },
+  //     },
+  //     include: {
+  //       categoriesChannel: {
+  //         include: { category: true },
+  //       },
+  //       stats: true,
+  //     },
+  //   });
 
-    console.log("update result:", updatedChannel); // Debug log
-    return updatedChannel;
-  }
+  //   console.log("update result:", updatedChannel); // Debug log
+  //   return updatedChannel;
+  // }
 
-  async delete(id: string) {
-    const channel = await this.getById(id);
+  // async delete(id: string) {
+  //   const channel = await this.getById(id);
 
-    await this.telegram.notifyChannelDeleted(id);
+  //   await this.telegram.notifyChannelDeleted(id);
 
-    const deletedChannel = await this.prisma.channel.delete({
-      where: { id },
-    });
-    console.log("delete result:", deletedChannel); // Debug log
-    return deletedChannel;
-  }
+  //   const deletedChannel = await this.prisma.channel.delete({
+  //     where: { id },
+  //   });
+  //   console.log("delete result:", deletedChannel); // Debug log
+  //   return deletedChannel;
+  // }
 
   // async verify(dto: VerifyChannelDto, userId: string) {
+  //   console.log("verify input url:", dto.url); // Debug log
+
   //   const channel = await this.prisma.channel.findUnique({
   //     where: { url: dto.url },
+  //     include: { user: { select: { name: true, telegramId: true } } },
   //   });
 
   //   if (!channel) {
-  //     throw new NotFoundException("Канал не найден");
+  //     throw new NotFoundException({
+  //       message: "Канал не найден",
+  //       suggestion: "Добавьте канал в разделе Мои Каналы",
+  //     });
+  //   }
+
+  //   if (channel.userId === userId) {
+  //     throw new BadRequestException("Канал уже принадлежит вам");
   //   }
 
   //   const existingVerification =
@@ -465,21 +479,164 @@ export class ChannelService {
   //   ]);
 
   //   for (const modId of TELEGRAM_MODERATORS) {
-  //     await this.telegram.sendMessage(
-  //       modId,
-  //       `📩 Пользователь @${user?.name ?? "пользователь"} запросил подтверждение прав на канал:\n📎 ${dto.url}`,
-  //       {
-  //         parse_mode: "HTML",
-  //         ...inlineKeyboard,
-  //       }
-  //     );
+  //     const message = channel.userId
+  //       ? `📩 Пользователь @${user?.name ?? "пользователь"} запросил подтверждение прав на канал:\n📎 ${dto.url}\n⚠️ Текущий владелец: @${channel.user?.name ?? "неизвестно"}`
+  //       : `📩 Пользователь @${user?.name ?? "пользователь"} запросил подтверждение прав на канал:\n📎 ${dto.url}`;
+  //     await this.telegram.sendMessage(modId, message, {
+  //       parse_mode: "HTML",
+  //       ...inlineKeyboard,
+  //     });
   //   }
 
   //   return { message: "Запрос на подтверждение отправлен" };
   // }
 
+  async create(dto: ChannelDto, userId: string, file?: Express.Multer.File) {
+    let avatarUrl: string | undefined;
+
+    if (file) {
+      const fileResponse = await this.fileService.saveAvatar(file, dto.url);
+      avatarUrl = fileResponse.url;
+    }
+
+    const { avatarFile, categoryIds, ...channelData } = dto;
+
+    const createdChannel = await this.prisma.channel.create({
+      data: {
+        ...channelData,
+        avatar: avatarUrl,
+        userId,
+        status: ChannelStatus.MODERATION,
+        categoriesChannel: categoryIds?.length
+          ? {
+              create: categoryIds.map((categoryId) => ({
+                category: { connect: { id: categoryId } },
+              })),
+            }
+          : undefined,
+        stats: {
+          create: {
+            isVerified: false,
+          },
+        },
+      },
+      include: {
+        categoriesChannel: {
+          include: { category: true },
+        },
+        stats: true,
+      },
+    });
+
+    console.log("create result:", createdChannel);
+
+    const user = await this.prisma.user.findUnique({
+      where: { id: userId },
+      select: { name: true, telegramId: true },
+    });
+
+    if (user?.telegramId) {
+      await this.telegram.sendMessage(
+        Number(user.telegramId),
+        `✅ Ваш канал <b>${createdChannel.url}</b> успешно добавлен. Ожидайте модерации.`,
+        { parse_mode: "HTML" }
+      );
+    }
+
+    const inlineKeyboard = Markup.inlineKeyboard([
+      [
+        Markup.button.callback(
+          "💬 Связаться с клиентом",
+          `start_chat:${createdChannel.id}:${user?.telegramId}`
+        ),
+      ],
+      [
+        Markup.button.callback(
+          "✅ Одобрить",
+          `approve:${createdChannel.id}:${user?.telegramId}`
+        ),
+        Markup.button.callback(
+          "❌ Отклонить",
+          `reject:${createdChannel.id}:${user?.telegramId}`
+        ),
+      ],
+    ]);
+
+    // Отправляем только MODERATOR_CHANNELS
+    await this.telegram.sendMessage(
+      MODERATOR_CHANNELS,
+      `📥 Новый канал от @${user?.name ?? "пользователь"}:\n📎 ${createdChannel.url}`,
+      {
+        parse_mode: "HTML",
+        ...inlineKeyboard,
+      }
+    );
+
+    // И в групповой чат, если он задан
+    if (TELEGRAM_GROUP_CHAT_ID) {
+      await this.telegram.sendMessage(
+        TELEGRAM_GROUP_CHAT_ID,
+        `📥 Новый канал от @${user?.name ?? "пользователь"}:\n📎 ${createdChannel.url}`,
+        {
+          parse_mode: "HTML",
+          ...inlineKeyboard,
+        }
+      );
+    }
+
+    return createdChannel;
+  }
+
+  async update(id: string, dto: ChannelDto, file?: Express.Multer.File) {
+    await this.getById(id);
+
+    let avatarUrl: string | undefined;
+
+    if (file) {
+      const fileResponse = await this.fileService.saveAvatar(file, dto.url);
+      avatarUrl = fileResponse.url;
+    }
+
+    const { avatarFile, categoryIds, ...channelData } = dto;
+
+    const updatedChannel = await this.prisma.channel.update({
+      where: { id },
+      data: {
+        ...channelData,
+        avatar: avatarUrl ?? channelData.avatar,
+        categoriesChannel: {
+          deleteMany: {},
+          create: categoryIds?.map((categoryId) => ({
+            category: { connect: { id: categoryId } },
+          })),
+        },
+      },
+      include: {
+        categoriesChannel: {
+          include: { category: true },
+        },
+        stats: true,
+      },
+    });
+
+    console.log("update result:", updatedChannel);
+    return updatedChannel;
+  }
+
+  async delete(id: string) {
+    const channel = await this.getById(id);
+
+    await this.telegram.notifyChannelDeleted(id);
+
+    const deletedChannel = await this.prisma.channel.delete({
+      where: { id },
+    });
+    console.log("delete result:", deletedChannel);
+    return deletedChannel;
+  }
+
   async verify(dto: VerifyChannelDto, userId: string) {
-    console.log("verify input url:", dto.url); // Debug log
+    console.log("verify input url:", dto.url);
 
     const channel = await this.prisma.channel.findUnique({
       where: { url: dto.url },
@@ -519,7 +676,7 @@ export class ChannelService {
       },
     });
 
-    console.log("verify result:", verification); // Debug log
+    console.log("verify result:", verification);
 
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
@@ -553,11 +710,17 @@ export class ChannelService {
       ],
     ]);
 
-    for (const modId of TELEGRAM_MODERATORS) {
-      const message = channel.userId
-        ? `📩 Пользователь @${user?.name ?? "пользователь"} запросил подтверждение прав на канал:\n📎 ${dto.url}\n⚠️ Текущий владелец: @${channel.user?.name ?? "неизвестно"}`
-        : `📩 Пользователь @${user?.name ?? "пользователь"} запросил подтверждение прав на канал:\n📎 ${dto.url}`;
-      await this.telegram.sendMessage(modId, message, {
+    const message = channel.userId
+      ? `📩 Пользователь @${user?.name ?? "пользователь"} запросил подтверждение прав на канал:\n📎 ${dto.url}\n⚠️ Текущий владелец: @${channel.user?.name ?? "неизвестно"}`
+      : `📩 Пользователь @${user?.name ?? "пользователь"} запросил подтверждение прав на канал:\n📎 ${dto.url}`;
+
+    await this.telegram.sendMessage(MODERATOR_CHANNELS, message, {
+      parse_mode: "HTML",
+      ...inlineKeyboard,
+    });
+
+    if (TELEGRAM_GROUP_CHAT_ID) {
+      await this.telegram.sendMessage(TELEGRAM_GROUP_CHAT_ID, message, {
         parse_mode: "HTML",
         ...inlineKeyboard,
       });
