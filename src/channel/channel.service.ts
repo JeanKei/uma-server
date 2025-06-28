@@ -623,14 +623,38 @@ export class ChannelService {
     return updatedChannel;
   }
 
+  // async delete(id: string) {
+  //   const channel = await this.getById(id);
+
+  //   await this.telegram.notifyChannelDeleted(id);
+
+  //   const deletedChannel = await this.prisma.channel.delete({
+  //     where: { id },
+  //   });
+  //   console.log("delete result:", deletedChannel);
+  //   return deletedChannel;
+  // }
+
   async delete(id: string) {
     const channel = await this.getById(id);
 
     await this.telegram.notifyChannelDeleted(id);
 
+    // Удаляем связанные категории
+    await this.prisma.categoriesChannel.deleteMany({
+      where: { channelId: id },
+    });
+
+    // Удаляем связанные статистики
+    await this.prisma.stats.deleteMany({
+      where: { channelId: id },
+    });
+
+    // Удаляем сам канал
     const deletedChannel = await this.prisma.channel.delete({
       where: { id },
     });
+
     console.log("delete result:", deletedChannel);
     return deletedChannel;
   }
