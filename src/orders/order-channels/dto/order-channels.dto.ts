@@ -4,6 +4,7 @@ import {
   IsInt,
   ValidateNested,
   ArrayNotEmpty,
+  IsOptional,
 } from "class-validator";
 import { Type } from "class-transformer";
 
@@ -49,8 +50,8 @@ export class OrderChannelsDto {
   publishDates: PublishDateDto[];
 
   @IsArray()
-  @ArrayNotEmpty()
-  @IsString({ each: true }) // массив url картинок
+  @IsOptional()
+  @IsString({ each: true })
   imageUrls: string[];
 
   @IsInt()

@@ -21,7 +21,7 @@ export class OrderChannelsService {
         postText: dto.postText,
         totalPrice: dto.totalPrice,
         totalSubscribers: dto.totalSubscribers,
-        images: dto.imageUrls, // <- соответствие по названию
+        images: dto.imageUrls,
 
         publishDates: JSON.parse(JSON.stringify(dto.publishDates)),
         channels: JSON.parse(JSON.stringify(dto.channels)),
