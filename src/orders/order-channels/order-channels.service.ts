@@ -22,7 +22,6 @@ export class OrderChannelsService {
         totalPrice: dto.totalPrice,
         totalSubscribers: dto.totalSubscribers,
         images: dto.imageUrls,
-
         publishDates: JSON.parse(JSON.stringify(dto.publishDates)),
         channels: JSON.parse(JSON.stringify(dto.channels)),
       },
@@ -41,17 +40,44 @@ export class OrderChannelsService {
       );
     }
 
-    if (MODERATOR_UMA) {
-      const message = `📥 Новый заказ рекламы\n👤 Пользователь: @${user?.name ?? "неизвестно"}\n📦 Каналов: ${dto.channels.length}\n💰 Сумма: ${dto.totalPrice}₽\n🧑‍🤝‍🧑 Подписчиков: ${dto.totalSubscribers}`;
+    const moderatorMessage = `📥 Новый заказ рекламы
+👤 Пользователь: @${user?.name ?? "неизвестно"}
+📦 Каналов: ${dto.channels.length}
+💰 Сумма: ${dto.totalPrice}₽
+🧑‍🤝‍🧑 Подписчиков: ${dto.totalSubscribers}`;
 
-      await this.telegram.sendMessage(MODERATOR_UMA, message, {
+    // Отправка текста модераторам
+    if (MODERATOR_UMA) {
+      await this.telegram.sendMessage(MODERATOR_UMA, moderatorMessage, {
         parse_mode: "HTML",
       });
 
       if (TELEGRAM_GROUP_CHAT_ID) {
-        await this.telegram.sendMessage(TELEGRAM_GROUP_CHAT_ID, message, {
-          parse_mode: "HTML",
-        });
+        await this.telegram.sendMessage(
+          TELEGRAM_GROUP_CHAT_ID,
+          moderatorMessage,
+          {
+            parse_mode: "HTML",
+          }
+        );
+      }
+    }
+
+    // Отправка изображений, если есть
+    if (dto.imageUrls?.length) {
+      const HOST = process.env.API_HOST?.replace(/\/$/, "") || "";
+
+      const mediaGroup = dto.imageUrls.map((url) => ({
+        type: "photo" as const,
+        media: `${HOST}/uploads${url}`,
+      }));
+
+      if (MODERATOR_UMA) {
+        await this.telegram.sendMediaGroup(MODERATOR_UMA, mediaGroup);
+      }
+
+      if (TELEGRAM_GROUP_CHAT_ID) {
+        await this.telegram.sendMediaGroup(TELEGRAM_GROUP_CHAT_ID, mediaGroup);
       }
     }
 
